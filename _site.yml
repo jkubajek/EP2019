@@ -1,0 +1,31 @@
+name: "my-website"
+output_dir: "docs"
+exclude: ["*.txt", "*.csv", "*.xlsx", "*.RData", "*.R", "*.xls"] 
+output:
+  html_document:
+    theme: cosmo
+    highlight: textmate
+    toc_depth: 3
+    include:
+      after_body: footer.html
+    css: style.css
+navbar:
+  title: "Wybory do PE 2019"
+  left:
+    - text: "Wprowadzenie"
+      href: index.html
+    - text: "Wizualizacja"
+      href: wizualizacja.html
+    - text: "Analiza"
+      href: analiza.html
+    - text: "Istotność zmiennych"
+      href: istotnosc.html
+    - text: "Podsumowanie"
+      href: Podsumowanie.html
+  right:
+    - icon: fa-envelope fa-lg
+      href: mailto:j.kubajek@gmail.com
+    - icon: fa-github fa-lg
+      href: http://github.com/jkubajek
+    - icon: fa-linkedin fa-lg
+      href: https://www.linkedin.com/in/jakub-kubajek-869945158/

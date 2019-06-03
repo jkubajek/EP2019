@@ -1,5 +1,7 @@
+# ###################################################################
 # Libraries
 # ###################################################################
+# https://robertmitchellv.com/blog-building-site-with-rmarkdown.html
 library(dplyr)
 library(tidyr)
 library(foreign)
@@ -41,20 +43,35 @@ votes <- read.xlsx("EP2019/data/wyniki_gl_na_listy_po_powiatach.xlsx") %>%
            votes_wiosna_perc = (votes_wiosna / votes_all) * 100,
            votes_ke_perc = (votes_ke / votes_all) * 100 ,
            votes_konfederacja_perc = (votes_konfederacja / votes_all) * 100,
+           votes_kukiz_perc = (votes_kukiz / votes_all) * 100,
+           votes_razem_perc = (votes_razem / votes_all) * 100,
            TERYT = substr(TERYT, 1, 4)) %>%
     dplyr::select(TERYT, nazwa, votes_pis_perc, votes_wiosna_perc, votes_ke_perc,
-                  votes_konfederacja_perc)
+                  votes_konfederacja_perc, votes_kukiz_perc, votes_razem_perc)
+
+proc_data <- read.xlsx("EP2019/data/wyniki_gl_na_listy_po_powiatach_proc.xlsx") %>%
+    dplyr::select(TERYT, frekwencja, proc_niewaznych) %>%
+    mutate(frekwencja = gsub(frekwencja, pattern = ",", replacement = ".", fixed = T) %>% as.numeric(),
+           proc_niewaznych = gsub(proc_niewaznych, pattern = ",", replacement = ".", fixed = T) %>% as.numeric(),
+           TERYT = substr(TERYT, 1, 4))
 
 votes_2015 <- read.xlsx("EP2019/data/2015-gl-lis-pow.xlsx") %>%
     dplyr::select(TERYT, votes_2015_all, votes_2015_po, votes_2015_pis, 
                   votes_2015_psl, votes_2015_sld, votes_2015_n,
-                  votes_2015_korwin, votes_2015_kukiz, votes_2015_razem,
+                  votes_2015_korwin, votes_2015_braun, votes_2015_kukiz, votes_2015_razem,
                   wydane_karty, l_wyborcow) %>%
     mutate(votes_2015_pis_perc = (votes_2015_pis / votes_2015_all) * 100,
-           votes_2015_po_perc = ((votes_2015_po + votes_2015_sld + votes_2015_psl + 
+           votes_2015_ke_perc = ((votes_2015_po + votes_2015_sld + votes_2015_psl + 
                                      votes_2015_n) / votes_2015_all) * 100,
-           frekwencja_2015 = wydane_karty / l_wyborcow * 100) %>%
-    dplyr::select(TERYT, votes_2015_pis_perc, votes_2015_po_perc, frekwencja_2015)
+           votes_2015_braun = ifelse(is.na(votes_2015_braun), 0, votes_2015_braun),
+           votes_2015_konfederacja_perc = ((votes_2015_korwin + votes_2015_braun) / votes_2015_all) * 100,
+           votes_2015_kukiz_perc = (votes_2015_kukiz /votes_2015_all) * 100,
+           votes_2015_razem_perc = (votes_2015_razem /votes_2015_all) * 100) %>%
+    left_join(read.xlsx("EP2019/data/2015-gl-lis-pow-proc.xlsx") %>%
+                  dplyr::select(TERYT, Frekwencja) %>%
+                  rename(frekwencja_2015 = Frekwencja), by = "TERYT") %>%
+    dplyr::select(TERYT, votes_2015_pis_perc, votes_2015_ke_perc, frekwencja_2015, votes_2015_konfederacja_perc,
+                  votes_2015_kukiz_perc, votes_2015_razem_perc)
 
 salaries <- read.xlsx("EP2019/data/WYNA_2497_XTAB_20190527184602.xlsx", sheet = "TABLICA") %>%
     dplyr::select(Kod, X18) %>%
@@ -109,12 +126,6 @@ partners <- read.xlsx("EP2019/data/NARO_3422_XTAB_20190531200908.xlsx", sheet = 
     mutate(partners_perc_log = log(partners_perc)) %>%
     dplyr::select(TERYT, partners_perc, marriage_perc, partners_perc_log)
 
-proc_data <- read.xlsx("EP2019/data/wyniki_gl_na_listy_po_powiatach_proc.xlsx") %>%
-    dplyr::select(TERYT, frekwencja, proc_niewaznych) %>%
-    mutate(frekwencja = gsub(frekwencja, pattern = ",", replacement = ".", fixed = T) %>% as.numeric(),
-           proc_niewaznych = gsub(proc_niewaznych, pattern = ",", replacement = ".", fixed = T) %>% as.numeric(),
-           TERYT = substr(TERYT, 1, 4))
-
 flood <- read.xlsx("EP2019/data/politycy_powodz.xlsx") %>%
     dplyr::select(-nazwa) %>%
     mutate(politics = ifelse(is.na(politics), 0, politics),
@@ -150,6 +161,11 @@ dataset <- votes %>%
     inner_join(education, by = "TERYT") %>%
     mutate(TERYT = substr(TERYT, 1, 4),
            votes_pis_perc_diff = votes_pis_perc - votes_2015_pis_perc,
+           votes_ke_perc_diff = votes_ke_perc - votes_2015_ke_perc,
+           votes_konfederacja_perc_diff = votes_konfederacja_perc - votes_2015_konfederacja_perc,
+           votes_kukiz_perc_diff = votes_kukiz_perc - votes_2015_kukiz_perc,
+           votes_razem_perc_diff = votes_razem_perc - votes_2015_razem_perc,
+           frekwencja_diff = frekwencja - frekwencja_2015,
            rand_val = rnorm(nrow(.))) %>%
     mutate(POW = substr(TERYT, 3, 4) %>% as.numeric(),
            miasto_powiatowe = ifelse(POW > 40, 1, 0),
@@ -159,6 +175,9 @@ dataset <- votes %>%
 
 save(dataset, file = "EP2019/data/dataset.RData")
 
+# ###################################################################
+# Initial analysis
+# ###################################################################
 model_frekwencja <- lm(frekwencja ~ unempl + 
                            salary_log + pop_density_log + 
                            #children_perc +
@@ -203,17 +222,39 @@ ggplot(dataset)+
 # ###################################################################
 # Interactive map
 # ###################################################################
-mapa <- readOGR(dsn = "Maps/Powiaty/powiaty.shp")
-mapa <- spTransform(mapa, "+proj=longlat")
+load("EP2019/data/dataset.RData")
+# mapa <- readOGR(dsn = "Maps/Powiaty/powiaty.shp", layer = "powiaty")
+# mapa <- spTransform(mapa, "+proj=longlat")
+# 
+# # http://edrub.in/blog20170806.html
+# mapa_2 <- rmapshaper::ms_simplify(mapa, keep = 0.01)
+# mapa_2 <- spTransform(mapa_2, "+proj=longlat")
+# par(mfrow = c(1, 2))
+# plot(mapa_2)
+# plot(mapa)
+# 
+# mapa <- mapa_2
+# save(mapa, file = "EP2019/data/map_simplified.RData")
+load("EP2019/data/map_simplified.RData")
 mapa <- merge(y = dataset, x = mapa, by.x = "jpt_kod_je", by.y = "TERYT")
+###
+# Groups
+num_var <- 4
+plot_leaflet_map_groups(mapa, variables_to_plot = c("votes_pis_perc", "votes_ke_perc", "votes_wiosna_perc", "votes_konfederacja_perc"),
+                        groups_names = c("PiS", "KE", "Wiosna", "Konfederacja"), 
+                        name_of_region = "nazwa",
+                        popup_texts = rep("Poparcie: ", num_var),  end_texts = rep("%", num_var), 
+                        legend_digits = c(0, 0, 1, 1), popup_round = 2, frame_height = 500)
 
-plot_leaflet_map(mapa, variable_to_plot = unempl_factor, nazwa, "Relatywny spadek bezrobocia: ",
+###
+plot_leaflet_map(mapa, variable_to_plot = unempl_factor, nazwa, group_name = "PiS 2019",
+                 "Relatywny spadek bezrobocia: ",
                  popup_round = 2, frame_height = 500, legend_digits = 0, end_text = "%")
 
 plot_leaflet_map(mapa, variable_to_plot = votes_konfederacja_perc, nazwa, "Poparcie dla Konfederacji: ",
                  popup_round = 2, frame_height = 500, legend_digits = 0, end_text = "%")
 
-plot_leaflet_map(mapa, variable_to_plot = votes_pis_perc, nazwa, "Poparcie dla PiS: ",
+plot_leaflet_map(mapa_2, variable_to_plot = votes_pis_perc, nazwa, "Poparcie dla PiS: ",
                  popup_round = 2, frame_height = 500, legend_digits = 0, end_text = "%")
 
 plot_leaflet_map(mapa, variable_to_plot = partners_perc, nazwa, "Związki nieformalne: ",
@@ -381,3 +422,7 @@ GGally::ggpairs(cor_data,
     theme_bw(base_size = 16)
 
 ggsave("EP2019/plots/variables_correlation.png", width = 12, height = 12, dpi = 300)
+
+# Site rendering
+setwd(paste0(main_dir, "/EP2019"))
+rmarkdown::render_site(encoding = "UTF-8")

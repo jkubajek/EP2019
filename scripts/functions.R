@@ -1,5 +1,5 @@
 plot_leaflet_map <- function(map_object, variable_to_plot, name_of_region,
-                             popup_text, end_text = "", popup_round = 2, frame_height = 500, legend_digits = 0){
+                             popup_text,  end_text = "", popup_round = 2, frame_height = 500, legend_digits = 0){
     
     # NSE
     variable <- enquo(variable_to_plot)
@@ -40,6 +40,58 @@ plot_leaflet_map <- function(map_object, variable_to_plot, name_of_region,
                   title = NULL,
                   position = "bottomright",
                   labFormat = labelFormat(digits = legend_digits)) %>%
+        frameWidget(height = frame_height)
+}
+
+plot_leaflet_map_groups <- function(map_object, variables_to_plot, groups_names,
+                                    name_of_region,
+                                    popup_texts,  end_texts, legend_digits, popup_round = 2, frame_height = 500){
+    
+    map_leaflet <- leaflet(data = map_object)
+    iter <- 1
+    
+    for (variable in variables_to_plot){
+        # Find breaks
+        brks <- classIntervals(map_object@data[, variable], n = 7, style = "jenks")
+        brks <- brks$brks
+        # "YlGnBu" "YlOrRd"
+        pal <- colorBin("YlGnBu", domain = map_object@data[, variable], bins = brks)
+        
+        
+        popup <- stringr::str_c("<strong>", map_object@data[, name_of_region], "</strong>",
+                                          "<br/>",
+                                          popup_texts[iter], round(map_object@data[, variable], popup_round), end_texts[iter]) %>%
+                       purrr::map(htmltools::HTML)
+        
+        map_leaflet <- map_leaflet %>%
+            addPolygons(label = popup,
+                        group = groups_names[iter],
+                        fillColor = ~pal(map_object@data[, variable]),
+                        color = "#444444",
+                        weight = 1,
+                        smoothFactor = 0.5,
+                        opacity = 1.0,
+                        fillOpacity = 0.7,
+                        highlightOptions = highlightOptions(color = "white",
+                                                            weight = 2,
+                                                            bringToFront = TRUE),
+                        labelOptions = labelOptions(
+                            style = list("font-weight" = "normal", padding = "3px 8px"),
+                            textsize = "15px",
+                            direction = "auto")) %>%
+            addLegend(pal = pal,
+                      group = groups_names[iter],
+                      values = map_object@data[, variable],
+                      opacity = 0.7,
+                      title = NULL,
+                      position = "bottomright",
+                      labFormat = labelFormat(digits = legend_digits[iter]))
+        iter <- iter + 1
+    }
+    map_leaflet %>%
+        addLayersControl(overlayGroups = groups_names,
+                         options = layersControlOptions(collapsed = FALSE)) %>%
+        hideGroup(groups_names[-1]) %>%
         frameWidget(height = frame_height)
 }
 

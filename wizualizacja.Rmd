@@ -1,0 +1,99 @@
+---
+title: "Wizualizacja przestrzenna"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = FALSE,
+	warning = FALSE,
+	cashe = TRUE,
+	dev="png", dev.args=list(type="cairo"), dpi = 300
+)
+```
+
+```{r echo = FALSE}
+library(dplyr)
+library(tidyr)
+library(foreign)
+library(openxlsx)
+library(ggplot2)
+
+library(rgdal)
+library(sp) # do tworzenia centroidow
+library(maptools)
+library(rgeos)
+library(RColorBrewer)
+library(ggmap)
+
+library(geospacom)
+library(spdep)
+
+library(grid)
+
+library(leaflet)
+library(widgetframe)
+
+# ###################################################################
+# Setting working directory and loading data
+# ###################################################################
+if(Sys.info()["sysname"] == "Windows"){
+    main_dir <- "D:/Osobiste/GitHub"
+} else {
+    main_dir <- "/home/rstudio/"
+}
+setwd(main_dir)
+
+source("EP2019/scripts/functions.R", encoding = "UTF-8")
+
+load("EP2019/data/dataset.RData")
+
+# mapa <- readOGR(dsn = "Maps/Powiaty/powiaty.shp")
+# mapa <- spTransform(mapa, "+proj=longlat")
+load("EP2019/data/map_simplified.RData")
+mapa <- merge(y = dataset, x = mapa, by.x = "jpt_kod_je", by.y = "TERYT")
+
+```
+
+Na poniższych mapa można zobaczyć wyniki wyborów do Parlamentu Europejskiego w 2019 r. zmianę poparcia głównych partii w stosunku do ich wyników z 2015 r. oraz główne zmienne społeczno-demograficzne oraz gospodarcze. 
+
+**Uwaga** ze względu na ograniczoną funkcjonalność pakietu *Leaflet* przed zmianą mapy należy najpierw odznaczyć obecną mapę, a dopiero póżniej wskazać kolejną.
+
+<br><br>
+
+#Poparcie w wyborach do PE 2019
+```{r echo = FALSE, fig.width=7, fig.height=8, fig.align = 'center', results='asis', cache=TRUE}
+num_var <- 7
+plot_leaflet_map_groups(mapa, variables_to_plot = c("votes_pis_perc", "votes_ke_perc", "votes_wiosna_perc", "votes_konfederacja_perc", "votes_kukiz_perc", "votes_razem_perc", "frekwencja"),
+                        groups_names = c("PiS", "KE", "Wiosna", "Konfederacja", "Kukiz", "Razem", "Frekwencja"), 
+                        name_of_region = "nazwa",
+                        popup_texts = rep("Poparcie: ", num_var),  end_texts = rep("%", num_var), 
+                        legend_digits = c(rep(0, 2), rep(1, 5)), popup_round = 2, frame_height = 500)
+```
+
+<br><br>
+
+#Zmiana poparcia w odniesieniu do wyborów do sejmu z 2015 r.
+```{r echo = FALSE, fig.width=7, fig.height=8, fig.align = 'center', results='asis', cache=TRUE}
+num_var <- 6
+plot_leaflet_map_groups(mapa, variables_to_plot = c("votes_pis_perc_diff", "votes_ke_perc_diff", "votes_konfederacja_perc_diff", "votes_kukiz_perc_diff", "votes_razem_perc_diff", "frekwencja_diff"),
+                        groups_names = c("PiS", "KE", "Konfederacja", "Kukiz", "Razem", "Frekwencja"), 
+                        name_of_region = "nazwa",
+                        popup_texts = rep("Poparcie: ", num_var),  end_texts = rep("%", num_var), 
+                        legend_digits = c(rep(0, 2), rep(1, 4)), popup_round = 2, frame_height = 500)
+```
+
+<br><br>
+
+#Zmianne społeczno-demograficzne i gospodarcze
+```{r echo = FALSE, fig.width=7, fig.height=8, fig.align = 'center', results='asis', cache=TRUE}
+num_var <- 6
+plot_leaflet_map_groups(mapa, 
+                        variables_to_plot = c("partners_perc", "benefit_500_pp_nom", "elderly_perc", "pop_density_log", "unempl_2019_04", "salary", "primary_uneducated_perc"),
+                        groups_names = c("Partnerzy", "500+ na osobę", "Osoby 60+", "Zaludnienie", "Bezrobocie", "Zarobki", "<= Podstawowe"), 
+                        name_of_region = "nazwa",
+                        popup_texts = c("Związki nieformalne: ", "500+ na osobę: ", "Osoby w wieku 60+: ", "Logarytm gęstość zaludnienia: ", "Bezrobocie 04.2019: ", "Średnia pensja 2017: ", "Wykształcenie podstawowe lub niższe: "),  
+                        end_texts = c("%", "zł", "%", " os/km2", "%", "zł", "%"), 
+                        legend_digits = c(1, 0, 1, 0, 1, 0, 1), popup_round = 2, frame_height = 500)
+```

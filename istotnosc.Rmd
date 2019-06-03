@@ -1,0 +1,5 @@
+---
+title: "Istotność zmiennych"
+---
+
+Tutaj będzie analiza istotności zmiennych.
