@@ -2,4 +2,4 @@
 title: "Wprowadzenie"
 ---
 
-To jest wprowadzenie!
+Tutaj będzie wprowadzenie.

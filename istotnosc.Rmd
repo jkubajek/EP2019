@@ -2,4 +2,105 @@
 title: "Istotność zmiennych"
 ---
 
-Tutaj będzie analiza istotności zmiennych.
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = FALSE,
+	warning = FALSE,
+	cashe = TRUE,
+	dev="png", dev.args=list(type="cairo"), dpi = 300
+)
+```
+
+```{r echo = FALSE}
+library(dplyr)
+library(tidyr)
+library(foreign)
+library(openxlsx)
+library(ggplot2)
+
+library(rgdal)
+library(sp) # do tworzenia centroidow
+library(maptools)
+library(rgeos)
+library(RColorBrewer)
+library(ggmap)
+
+library(geospacom)
+library(spdep)
+
+library(grid)
+
+library(leaflet)
+library(widgetframe)
+
+# ###################################################################
+# Setting working directory and loading data
+# ###################################################################
+if(Sys.info()["sysname"] == "Windows"){
+    main_dir <- "D:/Osobiste/GitHub"
+} else {
+    main_dir <- "/home/rstudio/"
+}
+setwd(main_dir)
+
+source("EP2019/scripts/functions.R", encoding = "UTF-8")
+
+load("EP2019/data/dataset.RData")
+
+```
+
+
+#Istność zmiennych w objaśnianiu wyniku PiS w 2019
+```{r echo = FALSE, fig.width=2.2, fig.height=2, fig.align = 'center', results='asis'}
+variables_DF <- data.frame(variable = c("unempl_2019_04", "unempl_2019_04_log", "unempl_factor", "salary_log", 
+                                        "pop_density_log", 
+                                        "frekwencja", "primary_uneducated_perc",
+                                        "partners_perc_log", "benefit_500_pp", "elderly_perc", 
+                                        "flood"),
+                           variable_name = c("Bezrobocie", "Logarytm bezrobocia", "Spadek bezrobocia", "Średnia płaca",
+                                             "Gęstość zaludnienia", "Frekwencja 2019",
+                                             "<= Podstawowe",
+                                             "Partnerzy (NSP 2011)", "500+ na osobę", "Osoby 60+",
+                                             "Powódź"))
+
+formula_votes_2019 <- votes_pis_perc ~
+    unempl_2019_04 +
+    salary_log +
+    pop_density_log +
+    frekwencja +
+    flood +
+    primary_uneducated_perc +
+    partners_perc_log +
+    benefit_500_pp +
+    elderly_perc
+
+# Random forest importance
+# https://explained.ai/rf-importance/
+
+RF_variables_importance(dataset, formula_votes_2019, variables_DF, 
+                        plot_title = "Waga zmiennych w wyjaśnianiu poparcia PiS")
+```
+
+<br> <br>
+
+#Istność zmiennych w objaśnianiu zmiany poparcia PiS
+```{r echo = FALSE, fig.width=2.2, fig.height=2, fig.align = 'center', results='asis'}
+
+formula_diff <- votes_pis_perc_diff ~
+    unempl_2019_04 +
+    salary_log +
+    pop_density_log +
+    frekwencja +
+    flood +
+    primary_uneducated_perc +
+    partners_perc_log +
+    benefit_500_pp +
+    elderly_perc
+
+# Random forest importance
+# https://explained.ai/rf-importance/
+
+RF_variables_importance(dataset, formula_diff, variables_DF, 
+                        plot_title = "Waga zmiennych w wyjaśnianiu zmiany poparcia PiS")
+```

@@ -228,7 +228,683 @@ $(document).ready(function () {
 </div>
 
 
-<p>Tutaj będzie analiza ekonometryczna.</p>
+<div id="poparcie-pis-w-2019" class="section level1">
+<h1>Poparcie PiS w 2019</h1>
+<table style="text-align:center">
+<caption>
+<strong>Wyniki modeli</strong>
+</caption>
+<tr>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+<em>OLS</em>
+</td>
+<td>
+<em>spatial</em>
+</td>
+<td>
+<em>spatial</em>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+<em></em>
+</td>
+<td>
+<em>autoregressive</em>
+</td>
+<td>
+<em>error</em>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+<td>
+(3)
+</td>
+</tr>
+<tr>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+unempl_2019_04
+</td>
+<td>
+0.331<sup>***</sup> (0.084)
+</td>
+<td>
+0.153<sup>**</sup> (0.075)
+</td>
+<td>
+0.149<sup>**</sup> (0.074)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+salary_log
+</td>
+<td>
+2.681 (2.898)
+</td>
+<td>
+1.528 (2.510)
+</td>
+<td>
+3.443 (2.265)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+pop_density_log
+</td>
+<td>
+0.809<sup>*</sup> (0.413)
+</td>
+<td>
+0.163 (0.362)
+</td>
+<td>
+0.314 (0.385)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+frekwencja
+</td>
+<td>
+0.228<sup>***</sup> (0.077)
+</td>
+<td>
+0.147<sup>**</sup> (0.067)
+</td>
+<td>
+0.170<sup>**</sup> (0.075)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+flood
+</td>
+<td>
+3.339<sup>***</sup> (1.129)
+</td>
+<td>
+1.353 (0.991)
+</td>
+<td>
+1.188 (1.114)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+primary_uneducated_perc
+</td>
+<td>
+0.817<sup>***</sup> (0.101)
+</td>
+<td>
+0.763<sup>***</sup> (0.088)
+</td>
+<td>
+0.652<sup>***</sup> (0.094)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+partners_perc_log
+</td>
+<td>
+-12.749<sup>***</sup> (0.502)
+</td>
+<td>
+-9.004<sup>***</sup> (0.538)
+</td>
+<td>
+-9.250<sup>***</sup> (0.636)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+benefit_500_pp
+</td>
+<td>
+0.225 (0.283)
+</td>
+<td>
+0.027 (0.250)
+</td>
+<td>
+1.285<sup>***</sup> (0.273)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+elderly_perc
+</td>
+<td>
+0.177 (0.146)
+</td>
+<td>
+-0.153 (0.131)
+</td>
+<td>
+0.093 (0.119)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+-4.808 (24.913)
+</td>
+<td>
+0.762 (21.582)
+</td>
+<td>
+-11.864 (20.163)
+</td>
+</tr>
+<tr>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Moran pvalue
+</td>
+<td>
+0
+</td>
+<td>
+0
+</td>
+<td>
+0.101
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.840
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.836
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Log Likelihood
+</td>
+<td>
+</td>
+<td>
+-1,105.293
+</td>
+<td>
+-1,072.360
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+sigma<sup>2</sup>
+</td>
+<td>
+</td>
+<td>
+19.455
+</td>
+<td>
+15.208
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Akaike Inf. Crit.
+</td>
+<td>
+</td>
+<td>
+2,234.586
+</td>
+<td>
+2,168.719
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error
+</td>
+<td>
+5.100 (df = 370)
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic
+</td>
+<td>
+216.146<sup>***</sup> (df = 9; 370)
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Wald Test (df = 1)
+</td>
+<td>
+</td>
+<td>
+122.214<sup>***</sup>
+</td>
+<td>
+705.190<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+LR Test (df = 1)
+</td>
+<td>
+</td>
+<td>
+95.956<sup>***</sup>
+</td>
+<td>
+161.823<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="3" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<p><br> <br></p>
+</div>
+<div id="zmiana-poparcia-dla-pis-miedzy-2015-a-2019" class="section level1">
+<h1>Zmiana poparcia dla PiS między 2015 a 2019</h1>
+<table style="text-align:center">
+<caption>
+<strong>Wyniki modeli</strong>
+</caption>
+<tr>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+<em>OLS</em>
+</td>
+<td>
+<em>spatial</em>
+</td>
+<td>
+<em>spatial</em>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+<em></em>
+</td>
+<td>
+<em>autoregressive</em>
+</td>
+<td>
+<em>error</em>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+<td>
+(3)
+</td>
+</tr>
+<tr>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+unempl_2019_04
+</td>
+<td>
+-0.186<sup>***</sup> (0.043)
+</td>
+<td>
+-0.184<sup>***</sup> (0.042)
+</td>
+<td>
+-0.128<sup>***</sup> (0.043)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+salary_log
+</td>
+<td>
+-5.506<sup>***</sup> (1.495)
+</td>
+<td>
+-5.267<sup>***</sup> (1.446)
+</td>
+<td>
+-4.639<sup>***</sup> (1.345)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+pop_density_log
+</td>
+<td>
+-0.608<sup>***</sup> (0.213)
+</td>
+<td>
+-0.629<sup>***</sup> (0.206)
+</td>
+<td>
+-0.488<sup>**</sup> (0.225)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+frekwencja
+</td>
+<td>
+-0.336<sup>***</sup> (0.040)
+</td>
+<td>
+-0.307<sup>***</sup> (0.039)
+</td>
+<td>
+-0.345<sup>***</sup> (0.043)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+flood
+</td>
+<td>
+0.718 (0.582)
+</td>
+<td>
+0.576 (0.565)
+</td>
+<td>
+0.919 (0.639)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+primary_uneducated_perc
+</td>
+<td>
+0.185<sup>***</sup> (0.052)
+</td>
+<td>
+0.198<sup>***</sup> (0.050)
+</td>
+<td>
+0.204<sup>***</sup> (0.055)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+partners_perc_log
+</td>
+<td>
+-2.220<sup>***</sup> (0.259)
+</td>
+<td>
+-1.925<sup>***</sup> (0.257)
+</td>
+<td>
+-1.811<sup>***</sup> (0.354)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+benefit_500_pp
+</td>
+<td>
+0.130 (0.146)
+</td>
+<td>
+0.062 (0.144)
+</td>
+<td>
+0.325<sup>**</sup> (0.158)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+elderly_perc
+</td>
+<td>
+0.357<sup>***</sup> (0.076)
+</td>
+<td>
+0.269<sup>***</sup> (0.075)
+</td>
+<td>
+0.281<sup>***</sup> (0.070)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+62.053<sup>***</sup> (12.848)
+</td>
+<td>
+58.340<sup>***</sup> (12.439)
+</td>
+<td>
+53.325<sup>***</sup> (11.874)
+</td>
+</tr>
+<tr>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Moran pvalue
+</td>
+<td>
+0
+</td>
+<td>
+0
+</td>
+<td>
+0.176
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.690
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.683
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Log Likelihood
+</td>
+<td>
+</td>
+<td>
+-895.106
+</td>
+<td>
+-867.559
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+sigma<sup>2</sup>
+</td>
+<td>
+</td>
+<td>
+6.477
+</td>
+<td>
+5.354
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Akaike Inf. Crit.
+</td>
+<td>
+</td>
+<td>
+1,814.212
+</td>
+<td>
+1,759.119
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error
+</td>
+<td>
+2.630 (df = 370)
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic
+</td>
+<td>
+91.639<sup>***</sup> (df = 9; 370)
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Wald Test (df = 1)
+</td>
+<td>
+</td>
+<td>
+18.189<sup>***</sup>
+</td>
+<td>
+147.851<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+LR Test (df = 1)
+</td>
+<td>
+</td>
+<td>
+13.079<sup>***</sup>
+</td>
+<td>
+68.171<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="3" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+</div>
 
 
 <br><br>

@@ -223,8 +223,8 @@ ggplot(dataset)+
 # Interactive map
 # ###################################################################
 load("EP2019/data/dataset.RData")
-# mapa <- readOGR(dsn = "Maps/Powiaty/powiaty.shp", layer = "powiaty")
-# mapa <- spTransform(mapa, "+proj=longlat")
+mapa <- readOGR(dsn = "Maps/Powiaty/powiaty.shp", layer = "powiaty")
+mapa <- spTransform(mapa, "+proj=longlat")
 # 
 # # http://edrub.in/blog20170806.html
 # mapa_2 <- rmapshaper::ms_simplify(mapa, keep = 0.01)
@@ -235,51 +235,8 @@ load("EP2019/data/dataset.RData")
 # 
 # mapa <- mapa_2
 # save(mapa, file = "EP2019/data/map_simplified.RData")
-load("EP2019/data/map_simplified.RData")
+# load("EP2019/data/map_simplified.RData")
 mapa <- merge(y = dataset, x = mapa, by.x = "jpt_kod_je", by.y = "TERYT")
-###
-# Groups
-num_var <- 4
-plot_leaflet_map_groups(mapa, variables_to_plot = c("votes_pis_perc", "votes_ke_perc", "votes_wiosna_perc", "votes_konfederacja_perc"),
-                        groups_names = c("PiS", "KE", "Wiosna", "Konfederacja"), 
-                        name_of_region = "nazwa",
-                        popup_texts = rep("Poparcie: ", num_var),  end_texts = rep("%", num_var), 
-                        legend_digits = c(0, 0, 1, 1), popup_round = 2, frame_height = 500)
-
-###
-plot_leaflet_map(mapa, variable_to_plot = unempl_factor, nazwa, group_name = "PiS 2019",
-                 "Relatywny spadek bezrobocia: ",
-                 popup_round = 2, frame_height = 500, legend_digits = 0, end_text = "%")
-
-plot_leaflet_map(mapa, variable_to_plot = votes_konfederacja_perc, nazwa, "Poparcie dla Konfederacji: ",
-                 popup_round = 2, frame_height = 500, legend_digits = 0, end_text = "%")
-
-plot_leaflet_map(mapa_2, variable_to_plot = votes_pis_perc, nazwa, "Poparcie dla PiS: ",
-                 popup_round = 2, frame_height = 500, legend_digits = 0, end_text = "%")
-
-plot_leaflet_map(mapa, variable_to_plot = partners_perc, nazwa, "Związki nieformalne: ",
-                 popup_round = 2, frame_height = 500, legend_digits = 1, end_text = "%")
-
-plot_leaflet_map(mapa, variable_to_plot = salary, nazwa, "Średnia płaca w 2017: ",
-                 popup_round = 0, frame_height = 500, legend_digits = 0, end_text = "")
-
-plot_leaflet_map(mapa, variable_to_plot = salary_log, nazwa, "Logarytm średniej płacy w 2017: ",
-                 popup_round = 1, frame_height = 500, legend_digits = 1, end_text = "")
-
-plot_leaflet_map(mapa, variable_to_plot = frekwencja, nazwa, "Frekwencja w wyborach do PE: ",
-                 popup_round = 2, frame_height = 500, legend_digits = 0, end_text = "%")
-
-plot_leaflet_map(mapa, variable_to_plot = benefit_500_pp_nom, nazwa, "500+ na osobę: ",
-                 popup_round = 0, frame_height = 500, legend_digits = 0, end_text = " zł")
-
-plot_leaflet_map(mapa, variable_to_plot = primary_uneducated_perc, nazwa, "Wykształcenie podstawowe lub niższe: ",
-                 popup_round = 2, frame_height = 500, legend_digits = 1, end_text = "%")
-
-plot_leaflet_map(mapa, variable_to_plot = elderly_perc, nazwa, "Osoby w wieku 60+: ",
-                 popup_round = 2, frame_height = 500, legend_digits = 1, end_text = "%")
-
-plot_leaflet_map(mapa, variable_to_plot = unempl_2019_04, nazwa, "Bezrobocie 04.2019: ",
-                 popup_round = 2, frame_height = 500, legend_digits = 1, end_text = "%")
 
 # ###################################################################
 # Econometric analysis
@@ -315,7 +272,18 @@ model_formula <- votes_pis_perc ~
     benefit_500_pp +
     elderly_perc
 
-model_OLS <- lm(model_formula, data = mapa@data)
+formula_votes_2019 <- votes_pis_perc ~
+    unempl_2019_04 +
+    salary_log +
+    pop_density_log +
+    frekwencja +
+    flood +
+    primary_uneducated_perc +
+    partners_perc_log +
+    benefit_500_pp +
+    elderly_perc
+
+model_OLS <- lm(formula_votes_2019, data = mapa@data)
 model_OLS %>% summary()
 car::vif(model_OLS)
 
@@ -337,33 +305,35 @@ moran.plot(res, w_mat, ylab="Opóźnienie przestrzenne reszt: W*e", xlab="Reszty
            main = "Wykres Morana sąsiedztwo I rzędu", col = sgh_green) 
 
 # Model SAR Slag
-model_SAR_Slag <- lagsarlm(model_formula, listw = w_mat, data = mapa@data)
+model_SAR_Slag <- lagsarlm(formula_votes_2019, listw = w_mat, data = mapa@data)
 model_SAR_Slag %>% summary()
 moran_SAR <- moran.test(model_SAR_Slag$residuals, listw = w_mat)
 
 # Model SEM
-model_SEM <- errorsarlm(model_formula, listw = w_mat, data = mapa@data)
+model_SEM <- errorsarlm(formula_votes_2019, listw = w_mat, data = mapa@data)
 model_SEM %>% summary()
 moran_SEM <- moran.test(model_SEM$residuals, listw = w_mat)
 
-residualas_SEM <- data.frame(id = mapa@data$jpt_kod_je, residual = model_SEM$residuals)
-narysuj_mape(mapa_DF, "residual", obserwacje = residualas_SEM, tytul = "Reszty SEM")
 
 # Model SDEM
-model_SDEM <- errorsarlm(model_formula, listw = w_mat, data = mapa@data, etype = "emixed")
+model_SDEM <- errorsarlm(formula_votes_2019, listw = w_mat, data = mapa@data, etype = "emixed")
 model_SDEM %>% summary()
 moran.test(model_SDEM$residuals, listw = w_mat)
 
-residualas_SDEM <- data.frame(id = mapa@data$jpt_kod_je, residual = model_SDEM$residuals)
-narysuj_mape(mapa_DF, "residual", obserwacje = residualas_SDEM, tytul = "Reszty SDEM")
 
 # Model SARAR
-model_SARAR <- sacsarlm(model_formula, listw = w_mat, data = mapa@data)
+model_SARAR <- sacsarlm(formula_votes_2019, listw = w_mat, data = mapa@data)
 model_SARAR %>% summary()
-moran.test(model_SARAR$residuals, listw = w_mat)
+moran_SARAR <- moran.test(model_SARAR$residuals, listw = w_mat)
 
-out <- stargazer::stargazer(model_OLS, model_SAR_Slag, model_SEM, 
-                            type = 'html',
+model_SARAR$type <- model_SEM$type
+
+save(model_OLS, moran_OLS, model_SAR_Slag, moran_SAR, model_SEM, moran_SEM,
+     file = "Data/EP2019/models_PiS_2019.RData")
+
+out <- stargazer::stargazer(model_OLS, model_SAR_Slag, model_SEM,
+                            # type = 'html',
+                            type = 'text',
                             dep.var.labels.include = FALSE,
                             dep.var.caption = "",
                             omit.stat = c("n"),
@@ -375,7 +345,38 @@ out <- stargazer::stargazer(model_OLS, model_SAR_Slag, model_SEM,
                                                return_moran_p_val(moran_SEM)))
                             )
 
+# Model on diff
+formula_diff <- votes_pis_perc_diff ~
+    unempl_2019_04 +
+    salary_log +
+    pop_density_log +
+    frekwencja +
+    flood +
+    primary_uneducated_perc +
+    partners_perc_log +
+    benefit_500_pp +
+    elderly_perc
 
+model_OLS <- lm(formula_diff, data = mapa@data)
+model_OLS %>% summary()
+car::vif(model_OLS)
+
+# Wystepuja zaleznosci przestrzenne
+moran_OLS <- lm.morantest(model_OLS, w_mat, alternative = "greater")
+
+# Model SAR Slag
+model_SAR_Slag <- lagsarlm(formula_diff, listw = w_mat, data = mapa@data)
+model_SAR_Slag %>% summary()
+moran_SAR <- moran.test(model_SAR_Slag$residuals, listw = w_mat)
+
+# Model SEM
+model_SEM <- errorsarlm(formula_diff, listw = w_mat, data = mapa@data)
+model_SEM %>% summary()
+moran_SEM <- moran.test(model_SEM$residuals, listw = w_mat)
+
+# Save models
+save(model_OLS, moran_OLS, model_SAR_Slag, moran_SAR, model_SEM, moran_SEM,
+     file = "Data/EP2019/models_diff_2019.RData")
 ##################################################
 # Variables importance
 ##################################################

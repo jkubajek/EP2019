@@ -63,7 +63,7 @@ Na poniższych mapa można zobaczyć wyniki wyborów do Parlamentu Europejskiego
 <br><br>
 
 #Poparcie w wyborach do PE 2019
-```{r echo = FALSE, fig.width=7, fig.height=8, fig.align = 'center', results='asis', cache=TRUE}
+```{r echo = FALSE, fig.width=7, fig.height=8, fig.align = 'center', results='asis', cache=FALSE}
 num_var <- 7
 plot_leaflet_map_groups(mapa, variables_to_plot = c("votes_pis_perc", "votes_ke_perc", "votes_wiosna_perc", "votes_konfederacja_perc", "votes_kukiz_perc", "votes_razem_perc", "frekwencja"),
                         groups_names = c("PiS", "KE", "Wiosna", "Konfederacja", "Kukiz", "Razem", "Frekwencja"), 
@@ -75,7 +75,7 @@ plot_leaflet_map_groups(mapa, variables_to_plot = c("votes_pis_perc", "votes_ke_
 <br><br>
 
 #Zmiana poparcia w odniesieniu do wyborów do sejmu z 2015 r.
-```{r echo = FALSE, fig.width=7, fig.height=8, fig.align = 'center', results='asis', cache=TRUE}
+```{r echo = FALSE, fig.width=7, fig.height=8, fig.align = 'center', results='asis', cache=FALSE}
 num_var <- 6
 plot_leaflet_map_groups(mapa, variables_to_plot = c("votes_pis_perc_diff", "votes_ke_perc_diff", "votes_konfederacja_perc_diff", "votes_kukiz_perc_diff", "votes_razem_perc_diff", "frekwencja_diff"),
                         groups_names = c("PiS", "KE", "Konfederacja", "Kukiz", "Razem", "Frekwencja"), 
@@ -87,7 +87,7 @@ plot_leaflet_map_groups(mapa, variables_to_plot = c("votes_pis_perc_diff", "vote
 <br><br>
 
 #Zmianne społeczno-demograficzne i gospodarcze
-```{r echo = FALSE, fig.width=7, fig.height=8, fig.align = 'center', results='asis', cache=TRUE}
+```{r echo = FALSE, fig.width=7, fig.height=8, fig.align = 'center', results='asis', cache=FALSE}
 num_var <- 6
 plot_leaflet_map_groups(mapa, 
                         variables_to_plot = c("partners_perc", "benefit_500_pp_nom", "elderly_perc", "pop_density_log", "unempl_2019_04", "salary", "primary_uneducated_perc"),

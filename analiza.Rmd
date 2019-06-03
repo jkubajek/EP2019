@@ -2,4 +2,86 @@
 title: "Analiza ekonometryczna"
 ---
 
-Tutaj będzie analiza ekonometryczna.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = FALSE,
+	warning = FALSE,
+	cashe = TRUE,
+	dev="png", dev.args=list(type="cairo"), dpi = 300
+)
+```
+
+```{r echo = FALSE}
+library(dplyr)
+library(tidyr)
+library(foreign)
+library(openxlsx)
+library(ggplot2)
+
+library(rgdal)
+library(sp) # do tworzenia centroidow
+library(maptools)
+library(rgeos)
+library(RColorBrewer)
+library(ggmap)
+
+library(geospacom)
+library(spdep)
+
+library(grid)
+
+library(leaflet)
+library(widgetframe)
+
+# ###################################################################
+# Setting working directory and loading data
+# ###################################################################
+if(Sys.info()["sysname"] == "Windows"){
+    main_dir <- "D:/Osobiste/GitHub"
+} else {
+    main_dir <- "/home/rstudio/"
+}
+setwd(main_dir)
+
+source("EP2019/scripts/functions.R", encoding = "UTF-8")
+
+```
+
+
+#Poparcie PiS w 2019
+```{r echo = FALSE, fig.width=7, fig.height=8, fig.align = 'center', results='asis'}
+load(paste0(main_dir, "/Data/EP2019/models_PiS_2019.RData"))
+stargazer::stargazer(model_OLS, model_SAR_Slag, model_SEM,
+                            type = 'html',
+                            dep.var.labels.include = FALSE,
+                            dep.var.caption = "",
+                            omit.stat = c("n"),
+                            title = "Wyniki modeli",
+                            single.row = TRUE, 
+                            # column.labels = c("W - odległość", "W - I st.", "W - 5k"),
+                            # digits = 2,
+                            add.lines = list(c("Moran pvalue", return_moran_p_val(moran_OLS), return_moran_p_val(moran_SAR), 
+                                               return_moran_p_val(moran_SEM)))
+                            )
+```
+
+<br> <br>
+
+#Zmiana poparcia dla PiS między 2015 a 2019
+```{r echo = FALSE, fig.width=7, fig.height=8, fig.align = 'center', results='asis'}
+load(paste0(main_dir, "/Data/EP2019/models_diff_2019.RData"))
+stargazer::stargazer(model_OLS, model_SAR_Slag, model_SEM,
+                            type = 'html',
+                            dep.var.labels.include = FALSE,
+                            dep.var.caption = "",
+                            omit.stat = c("n"),
+                            title = "Wyniki modeli",
+                            single.row = TRUE, 
+                            # column.labels = c("W - odległość", "W - I st.", "W - 5k"),
+                            # digits = 2,
+                            add.lines = list(c("Moran pvalue", return_moran_p_val(moran_OLS), return_moran_p_val(moran_SAR), 
+                                               return_moran_p_val(moran_SEM)))
+                            )
+```
