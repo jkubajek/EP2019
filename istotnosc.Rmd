@@ -50,31 +50,42 @@ load("EP2019/data/dataset.RData")
 
 ```
 
+W części poświęconej istotności zmiennych przedstawiono próbę oceny relatywnej istotności poszczególnych zmiennych w objaśnianiu wyniku PiS oraz zmiany poparcia dla tej partii. W tym celu wykorzystano dwa różne podejścia. 
 
-#Istność zmiennych w objaśnianiu wyniku PiS w 2019
-```{r echo = FALSE, fig.width=2.2, fig.height=2, fig.align = 'center', results='asis'}
+W pierwszym zdekomponowano wpływ poszczególnych zmiennych na wartość $R^2$ w modelu OLS. Wyznaczona w ten sposób wartość mówi jaki procent zmienności wyniku PiS na poziomie powiatów objaśnia dana zmienna. Do dekompozycji wartość $R^2$ wykorzystano funkcję *calc.relimp* z pakietu [relaimpo](https://www.rdocumentation.org/packages/relaimpo/versions/2.2-3).
+
+Drugi sposób wyznaczenia kluczowości poszczególnych zmiennych wykorzystuje jeden z popularniejszych modeli z zakresu uczenia maszynowego, czyli las losowy. W tym modelu kluczowość mówi o ile procent wzrasta błąd średniokwadratowy (MSE), gdy wartości danej zmiennej podda się permutacji, czyli gdy losowo zamienia się miejsca wystąpienia danych wartości.
+
+<br>
+
+
+# Wynik PiS 2019
+
+Na podstawie obu metod można wnioskować, że najistotniejszym czynnikiem wpływającym na poparcie dla partii rządzącej jest stopień konserwatyzmu w danym regionie. Czym bardziej konserwatywny powiat, tym lepszy wynik uzyskał PiS. Na kolejnym miejscu znalazł się poziom wykształcenia. Mniej istotne okazały się zmienne związane z głównymi programami wyborczymi partii rządzącej, czyli *500+* oraz *Emerytura+*. Niemniej, na podstawie przedstawionych wykresów można zauważyć, że wartość transferów z programu *500+* w przeliczeniu na jednego miekszkańca wyjaśnia 8% zmienności poparcia PiS w wyborach do PE.
+
+<br>
+
+```{r echo = FALSE, fig.width=2.2, fig.height=1.6, fig.align = 'center', results='asis'}
 variables_DF <- data.frame(variable = c("unempl_2019_04", "unempl_2019_04_log", "unempl_factor", "salary_log", 
                                         "pop_density_log", 
                                         "frekwencja", "primary_uneducated_perc",
                                         "partners_perc_log", "benefit_500_pp", "elderly_perc", 
-                                        "flood"),
+                                        "flood", "votes_2015_psl_perc", "votes_2015_kukiz_perc"),
                            variable_name = c("Bezrobocie", "Logarytm bezrobocia", "Spadek bezrobocia", "Średnia płaca",
                                              "Gęstość zaludnienia", "Frekwencja 2019",
-                                             "<= Podstawowe",
-                                             "Partnerzy (NSP 2011)", "500+ na osobę", "Osoby 60+",
-                                             "Powódź"))
+                                             "Wykształcenie",
+                                             "Partnerzy", "500+", "Osoby 60+",
+                                             "Powódź", "PSL 2015", "Kukiz 2015"))
 
-formula_votes_2019 <- votes_pis_perc ~
-    unempl_2019_04 +
-    salary_log +
-    pop_density_log +
-    frekwencja +
-    flood +
-    primary_uneducated_perc +
-    partners_perc_log +
-    benefit_500_pp +
-    elderly_perc
+load(paste0(main_dir, "/Data/EP2019/models_PiS_2019.RData"))
 
+OLS_variables_importance(model_OLS, variables_DF, 
+                        plot_title = "Dekompozycja zmienności poparcia PiS")
+```
+
+<br>
+
+```{r echo = FALSE, fig.width=2.2, fig.height=1.6, fig.align = 'center', results='asis'}
 # Random forest importance
 # https://explained.ai/rf-importance/
 
@@ -84,19 +95,24 @@ RF_variables_importance(dataset, formula_votes_2019, variables_DF,
 
 <br> <br>
 
-#Istność zmiennych w objaśnianiu zmiany poparcia PiS
-```{r echo = FALSE, fig.width=2.2, fig.height=2, fig.align = 'center', results='asis'}
+# Zmiana poparcia PiS
 
-formula_diff <- votes_pis_perc_diff ~
-    unempl_2019_04 +
-    salary_log +
-    pop_density_log +
-    frekwencja +
-    flood +
-    primary_uneducated_perc +
-    partners_perc_log +
-    benefit_500_pp +
-    elderly_perc
+Analiza istotności zmiennych w odniesieniu do zmiany poparcia PiS dostarcza bardzo interesujących wniosków, ponieważ najistotniejszą zmienną okazał się poziom poparcia PSL w 2015 r. Może to wskazywać na to, że duża część wrostu poparcia PiS wynika z przystąpienia przez PSL do Koalicji Europejskiej. Do podobnego wniosku można dojść analizując mapy przedstawiające zmianę poparcia PiS oraz wynik PSL z 2015. Największy wzrost PiS odnotował w powiatach, w których PSL miał ponad kilkanaście procent poparcia.
+
+Zdecydowanie mniej istotne w wyjaśnianiu zmiany poparcia partii rządzącej okazały się programy *500+* oraz *Emerytura+*. Jednocześnie, istotniejsza od wskazanych programów okazała się zmienna odzwierciedlająca stopień konserwatyzmu, czyli *Partnerzy*.
+
+```{r echo = FALSE, fig.width=2.2, fig.height=1.6, fig.align = 'center', results='asis'}
+
+load(paste0(main_dir, "/Data/EP2019/models_diff_2019.RData"))
+
+OLS_variables_importance(model_OLS, variables_DF, 
+                        plot_title = "Dekompozycja zmienności zmiany poparcia PiS")
+```
+
+
+<br>
+
+```{r echo = FALSE, fig.width=2.2, fig.height=1.6, fig.align = 'center', results='asis'}
 
 # Random forest importance
 # https://explained.ai/rf-importance/

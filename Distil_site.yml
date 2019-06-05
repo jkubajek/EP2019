@@ -1,0 +1,31 @@
+name: "EP2019"
+title: "Wybory do PE 2019"
+base_url: https://jkubajek.github.io/EP2019/index
+google_analytics: "UA-141513256-1"
+output_dir: "docs"
+exclude: ["*.txt", "*.csv", "*.xlsx", "*.RData", "*.R", "*.xls"] 
+output: 
+	distill::distill_article:
+		toc: true
+		toc_depth: 2
+		toc_float: true
+navbar:
+  title: "Wybory do PE 2019"
+  left:
+    - text: "Wprowadzenie"
+      href: index.html
+    - text: "Wizualizacja"
+      href: wizualizacja.html
+    - text: "Analiza"
+      href: analiza.html
+    - text: "Istotność zmiennych"
+      href: istotnosc.html
+    - text: "Podsumowanie"
+      href: Podsumowanie.html
+  right:
+    - icon: fa-envelope fa-lg
+      href: mailto:j.kubajek@gmail.com
+    - icon: fa-github fa-lg
+      href: http://github.com/jkubajek
+    - icon: fa-linkedin fa-lg
+      href: https://www.linkedin.com/in/jakub-kubajek-869945158/

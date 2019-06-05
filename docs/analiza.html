@@ -19,10 +19,14 @@
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
@@ -71,9 +75,7 @@ h6 {
 
 <link rel="stylesheet" href="style.css" type="text/css" />
 
-</head>
 
-<body>
 
 <style type = "text/css">
 .main-container {
@@ -92,8 +94,14 @@ img {
 .tabbed-pane {
   padding-top: 12px;
 }
+.html-widget {
+  margin-bottom: 20px;
+}
 button.code-folding-btn:focus {
   outline: none;
+}
+summary {
+  display: list-item;
 }
 </style>
 
@@ -109,7 +117,6 @@ body {
   padding-top: 56px;
   margin-top: -56px;
 }
-
 .section h2 {
   padding-top: 56px;
   margin-top: -56px;
@@ -129,6 +136,43 @@ body {
 .section h6 {
   padding-top: 56px;
   margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
 }
 </style>
 
@@ -150,19 +194,179 @@ $(document).ready(function () {
 });
 </script>
 
-
-<div class="container-fluid main-container">
-
 <!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
 });
 </script>
 
 <!-- code folding -->
 
 
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -228,14 +432,72 @@ $(document).ready(function () {
 </div>
 
 
-<div id="poparcie-pis-w-2019" class="section level1">
-<h1>Poparcie PiS w 2019</h1>
+<p>W niniejszej analizie wykorzystano zarówno zwykłą regresję liniową (OLS), jak i dwa modele z zakresu ekonometrii przestrzennej.</p>
+<p><br></p>
+<div id="ekonometria-przestrzenna" class="section level1">
+<h1>Ekonometria przestrzenna</h1>
+<p>Ekonometria przestrzenna pozwala na uwzględnienie zależności przestrzennych między obserwacjami. Jest ona podobna do analizy szeregów czasowych, ale procesy zachodzące między obserwacjami są bardziej złożone, ponieważ mają one miejsce w przestrzeni dwuwymiarowej, a nie jednowymiarowej jaką jest czas. W ekonometrii przestrzennej, na daną jednostkę wpływają jednostki sąsiednie, ale ona również ma na nie wpływ. Z tego powodu modele przestrzenne szacuje się metodą największej wiarygodności lub dwustopniową KMNK, a nie w pojedynczym kroku jak ma to miejsce w standardowej metodzie najmniejszych kwadratów (KMNK/OLS).</p>
+<p>W analizie wykorzystano dwa modele przestrzenne: model przestrzennej autoregresji (SAR) oraz model przestrzennej autokorelacji składnika losowego (SEM). Przyjmują one odpowiednio następujące postacie:</p>
+<p><span class="math display">\[
+\begin{aligned}
+SAR: \quad y_i = \alpha + x_i \beta + \rho W y_{j \neq i} + \varepsilon_{i} 
+\end{aligned}
+\]</span></p>
+<p><span class="math display">\[ 
+\begin{aligned}
+SEM: \quad y_i = \alpha + x_i \beta + \mu_{i} \\ \mu_{i} =  \lambda W \mu_{j \neq i} + \varepsilon_{i} 
+\end{aligned}
+\]</span></p>
+<p>Model SAR można traktować jako odpowiednik procesu AR w szeregach czasowych, zaś SEM jako MA. W przypadku gdy prawdziwa postać zależności przestrzennych przyjmuje formę autoregresyjną, to nieuwzględnienie istotnej zmiennej jaką są obserwacje <span class="math inline">\(y_{j \neq i}\)</span> powoduje obciążenie estymatorów w modelu regresji liniowej (OLS). Gdyby zależność przyjmowała faktycznie postać przestrzennej autokorelacji składnika losowego, to teoretycznie oszacowania OLS byłyby przez cały czas nieobciążone, ale nieefektywne. Oznacza to że zawyżone byłoby odchylenie standardowe poszczególnych oszacowań, co mogłoby doprowadzić do odrzucenia zmiennej, która jest istotna.</p>
+<p>Dużo więcej informacji na temat modeli przestrzennych można znaleźć na stronie <a href="https://web.sgh.waw.pl/~atoroj/">Andrzeja Torója</a> w zakładce <em>Ekonometria przestrzenna</em>, który prowadzi na SGH zajęcia między innymi z ekonometrii przestrzennej.</p>
+<p><br></p>
+<div id="macierz-w" class="section level2">
+<h2>Macierz W</h2>
+<p>We wzorach modeli przestrzennych pojawiła się macierz <span class="math inline">\(W\)</span>, która sprowadza macierz zależności przestrzenne między obserwacjami do wektora. Bez użycia macierzy W równanie modelu przestrzennego byłoby nieidentyfikowalne, ze względu na liczbę parametrów do oszacowania większą od liczby obserwacji.</p>
+<p>Standardowo macierze W wyznacza się na podstawie kryterium sąsiedztwa lub na podstawie odległości między obserwacjami. W tej analizie, modele przestrzenne zostały oszacowane przy użyciu macierzy, gdzie wagami połączeń między obserwacjami jest odwrotność odległości między geograficznymi środkami powiatów (centroidami). W przypadku gdy powiaty są odległe o ponad 100 km, waga połączeń między nimi przyjmuje zero.</p>
+<p><br></p>
+</div>
+<div id="test-morana" class="section level2">
+<h2>Test Morana</h2>
+<p>Test Morana jest testem statystycznym, który mierzy czy reszty z danego modelu są skorelowane przestrzennie, czyli bada czy mamy do czynienia z czynnikiem przestrzennym, który może zaburzać oszacowania lub ich istotność. Hipoteza zerowa testu mówi o braku autokorelacji przestrzennej reszt. Tym samym przy niskim <em>p value</em> tę hipotezę należy odrzucić na rzecz alternatywnego założenia o występowaniu czynnika przestrzennego.</p>
+<p><br></p>
+</div>
+</div>
+<div id="wynik-pis-w-2019" class="section level1">
+<h1>Wynik PiS w 2019</h1>
+<p>Na podstawie tabeli z wynikami modeli można zaobserwować, że w danych rzeczywiście występuje ukryte zjawisko przestrzenne, ponieważ <em>p value</em> testu Morana dla modelu OLS przyjmuje w zaokrągleniu zero. Co więcej, model autoregresji przestrzennej (SAR) jest niewystarczający do wyeliminowania ukrytych zależności. Dopiero model SEM pozwala na uwzględnienie procesu przestrzennego i poprawną estymację parametrów.</p>
+<p>Jedynie w modelu SEM zmienna <em>500+</em> staje się istotna, tym samym można zauważyć że posługując się zwykłą regresją liniową moglibyśmy dojść do błędnego wniosku, że program 500+ nie wpływa na poziom poparcia PiS.</p>
+<p>Warto również zwrócić uwagę na to że nieistotna w modelu SEM jest m.in. <em>Powódź</em>. Zmienna ta przyjmuje jeden dla powiatów, w których był ogłoszony stan alarmowy lub wystąpiły lokalne podtopienia. Może to wskazywać to na to, że wbrew głosom mówiącym o tym że obecność polityków PiS na wałach przeciwpowodziowych zwiększyła ich poparcie, taki efekt nie wystąpił lub był pomijalny statystycznie.</p>
+<p>Ponadto, statystycznie nieistotne okazały się następujące zmienne: <em>Zarobki</em>, <em>Zaludnienie</em> oraz <em>Osoby 60+</em>.</p>
+<p>Skrót <em>log</em> po nazwie niektórych zmiennych, oznacza że w modelu wykorzystano zlogarytmizowaną zmienną. Empiryczny poziom istotności (<em>p value</em>) podano pod oszacowaniem parametru.</p>
+<p><br></p>
+<div align="center">
 <table style="text-align:center">
 <caption>
 <strong>Wyniki modeli</strong>
 </caption>
 <tr>
 <td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="3">
+Zmienna objaśniana:
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="3">
+Poparcie PiS 2019
 </td>
 </tr>
 <tr>
@@ -268,13 +530,13 @@ $(document).ready(function () {
 <td style="text-align:left">
 </td>
 <td>
-(1)
+OLS
 </td>
 <td>
-(2)
+SAR
 </td>
 <td>
-(3)
+SEM
 </td>
 </tr>
 <tr>
@@ -283,142 +545,372 @@ $(document).ready(function () {
 </tr>
 <tr>
 <td style="text-align:left">
-unempl_2019_04
+Bezrobocie
 </td>
 <td>
-0.331<sup>***</sup> (0.084)
+0,331<sup>***</sup>
 </td>
 <td>
-0.153<sup>**</sup> (0.075)
+0,153<sup>**</sup>
 </td>
 <td>
-0.149<sup>**</sup> (0.074)
+0,149<sup>**</sup>
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-salary_log
 </td>
 <td>
-2.681 (2.898)
+p = 0,0002
 </td>
 <td>
-1.528 (2.510)
+p = 0,041
 </td>
 <td>
-3.443 (2.265)
+p = 0,045
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-pop_density_log
 </td>
 <td>
-0.809<sup>*</sup> (0.413)
 </td>
 <td>
-0.163 (0.362)
 </td>
 <td>
-0.314 (0.385)
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-frekwencja
+Zarobki log
 </td>
 <td>
-0.228<sup>***</sup> (0.077)
+2,681
 </td>
 <td>
-0.147<sup>**</sup> (0.067)
+1,528
 </td>
 <td>
-0.170<sup>**</sup> (0.075)
+3,443
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-flood
 </td>
 <td>
-3.339<sup>***</sup> (1.129)
+p = 0,356
 </td>
 <td>
-1.353 (0.991)
+p = 0,543
 </td>
 <td>
-1.188 (1.114)
+p = 0,129
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-primary_uneducated_perc
 </td>
 <td>
-0.817<sup>***</sup> (0.101)
 </td>
 <td>
-0.763<sup>***</sup> (0.088)
 </td>
 <td>
-0.652<sup>***</sup> (0.094)
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-partners_perc_log
+Wykształcenie
 </td>
 <td>
--12.749<sup>***</sup> (0.502)
+0,817<sup>***</sup>
 </td>
 <td>
--9.004<sup>***</sup> (0.538)
+0,763<sup>***</sup>
 </td>
 <td>
--9.250<sup>***</sup> (0.636)
+0,652<sup>***</sup>
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-benefit_500_pp
 </td>
 <td>
-0.225 (0.283)
+p = 0,000
 </td>
 <td>
-0.027 (0.250)
+p = 0,000
 </td>
 <td>
-1.285<sup>***</sup> (0.273)
+p = 0,000
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-elderly_perc
 </td>
 <td>
-0.177 (0.146)
 </td>
 <td>
--0.153 (0.131)
 </td>
 <td>
-0.093 (0.119)
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-Constant
+Zaludnienie log
 </td>
 <td>
--4.808 (24.913)
+0,809<sup>*</sup>
 </td>
 <td>
-0.762 (21.582)
+0,163
 </td>
 <td>
--11.864 (20.163)
+0,314
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+p = 0,051
+</td>
+<td>
+p = 0,653
+</td>
+<td>
+p = 0,415
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Frekwencja
+</td>
+<td>
+0,228<sup>***</sup>
+</td>
+<td>
+0,147<sup>**</sup>
+</td>
+<td>
+0,170<sup>**</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+p = 0,004
+</td>
+<td>
+p = 0,028
+</td>
+<td>
+p = 0,025
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Powódź
+</td>
+<td>
+3,339<sup>***</sup>
+</td>
+<td>
+1,353
+</td>
+<td>
+1,188
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+p = 0,004
+</td>
+<td>
+p = 0,173
+</td>
+<td>
+p = 0,287
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Partnerzy log
+</td>
+<td>
+-12,749<sup>***</sup>
+</td>
+<td>
+-9,004<sup>***</sup>
+</td>
+<td>
+-9,250<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+p = 0,000
+</td>
+<td>
+p = 0,000
+</td>
+<td>
+p = 0,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+500+
+</td>
+<td>
+0,225
+</td>
+<td>
+0,027
+</td>
+<td>
+1,285<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+p = 0,429
+</td>
+<td>
+p = 0,914
+</td>
+<td>
+p = 0,00001
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Osoby 60+
+</td>
+<td>
+0,177
+</td>
+<td>
+-0,153
+</td>
+<td>
+0,093
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+p = 0,228
+</td>
+<td>
+p = 0,243
+</td>
+<td>
+p = 0,436
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Stała
+</td>
+<td>
+-4,808
+</td>
+<td>
+0,762
+</td>
+<td>
+-11,864
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+p = 0,848
+</td>
+<td>
+p = 0,972
+</td>
+<td>
+p = 0,557
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
 </td>
 </tr>
 <tr>
@@ -444,7 +936,7 @@ Moran pvalue
 R<sup>2</sup>
 </td>
 <td>
-0.840
+0,840
 </td>
 <td>
 </td>
@@ -456,24 +948,11 @@ R<sup>2</sup>
 Adjusted R<sup>2</sup>
 </td>
 <td>
-0.836
+0,836
 </td>
 <td>
 </td>
 <td>
-</td>
-</tr>
-<tr>
-<td style="text-align:left">
-Log Likelihood
-</td>
-<td>
-</td>
-<td>
--1,105.293
-</td>
-<td>
--1,072.360
 </td>
 </tr>
 <tr>
@@ -483,10 +962,10 @@ sigma<sup>2</sup>
 <td>
 </td>
 <td>
-19.455
+19,455
 </td>
 <td>
-15.208
+15,208
 </td>
 </tr>
 <tr>
@@ -496,60 +975,10 @@ Akaike Inf. Crit.
 <td>
 </td>
 <td>
-2,234.586
+2,234,586
 </td>
 <td>
-2,168.719
-</td>
-</tr>
-<tr>
-<td style="text-align:left">
-Residual Std. Error
-</td>
-<td>
-5.100 (df = 370)
-</td>
-<td>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td style="text-align:left">
-F Statistic
-</td>
-<td>
-216.146<sup>***</sup> (df = 9; 370)
-</td>
-<td>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td style="text-align:left">
-Wald Test (df = 1)
-</td>
-<td>
-</td>
-<td>
-122.214<sup>***</sup>
-</td>
-<td>
-705.190<sup>***</sup>
-</td>
-</tr>
-<tr>
-<td style="text-align:left">
-LR Test (df = 1)
-</td>
-<td>
-</td>
-<td>
-95.956<sup>***</sup>
-</td>
-<td>
-161.823<sup>***</sup>
+2,168,719
 </td>
 </tr>
 <tr>
@@ -558,23 +987,49 @@ LR Test (df = 1)
 </tr>
 <tr>
 <td style="text-align:left">
-<em>Note:</em>
+Poziomy istotności
 </td>
 <td colspan="3" style="text-align:right">
-<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+<sup><em></sup>p&lt;0,1; <sup><strong></sup>p&lt;0,05; <sup></strong></em></sup>p&lt;0,01
 </td>
 </tr>
 </table>
+</div>
 <p><br> <br></p>
 </div>
-<div id="zmiana-poparcia-dla-pis-miedzy-2015-a-2019" class="section level1">
-<h1>Zmiana poparcia dla PiS między 2015 a 2019</h1>
+<div id="zmiana-poparcia-pis" class="section level1">
+<h1>Zmiana poparcia PiS</h1>
+<p>W drugim zestawie modeli zmienną objaśnianą była zmianę poparcia PiS między wyborami parlamentarnymi z 2015, a ostatnimi wyborami do PE. Również tutaj można zobaczyć, że uwzględnienie zależności przestrzennych wpływa na zmianę istotności statystycznej poszczególnych zmiennych oraz ich parametry. Podobnie jak wcześniej jedynie model SEM pozwolił wyeliminować ukryty czynnik przestrzenny.</p>
+<p>Analizując wyniki modeli, warto zwrócić uwagę na wartość parametrów stojących przy zmiennych <em>PSL 2015</em> oraz <em>Kukiz 2015</em>. Parametr o wartości <span class="math inline">\(0,435\)</span>, stojący przy zmiennej <em>PSL 2015</em>, oznacza że 1 pkt. proc. poparcia PSLu w 2015 r. przełożył się na wzrost poparcie PiS o 0,435 pkt. proc.</p>
+<p>W modelu nieistotny okazał się wpływ programu <em>500+</em>, co w połączeniu z wyniami pierwszej części analizy może sugerować, że tzw. <em>efekt 500+</em> wystąpił w wyborach parlamentarnych z 2015 i trwa do tej pory na stałym poziomie, a wprowadzenie dodatkowego świadczenia na pierwsze dziecko nie przełożyło się na dodatkowy wzrost poparcia obozu rządzącego.</p>
+<p><br></p>
+<div align="center">
 <table style="text-align:center">
 <caption>
 <strong>Wyniki modeli</strong>
 </caption>
 <tr>
 <td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="3">
+Zmienna objaśniana:
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="3">
+Zmiana poparcia PiS
 </td>
 </tr>
 <tr>
@@ -607,13 +1062,13 @@ LR Test (df = 1)
 <td style="text-align:left">
 </td>
 <td>
-(1)
+OLS
 </td>
 <td>
-(2)
+SAR
 </td>
 <td>
-(3)
+SEM
 </td>
 </tr>
 <tr>
@@ -622,142 +1077,446 @@ LR Test (df = 1)
 </tr>
 <tr>
 <td style="text-align:left">
-unempl_2019_04
+Bezrobocie
 </td>
 <td>
--0.186<sup>***</sup> (0.043)
+-0,103<sup>***</sup>
 </td>
 <td>
--0.184<sup>***</sup> (0.042)
+-0,104<sup>***</sup>
 </td>
 <td>
--0.128<sup>***</sup> (0.043)
+-0,042
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-salary_log
 </td>
 <td>
--5.506<sup>***</sup> (1.495)
+p = 0,005
 </td>
 <td>
--5.267<sup>***</sup> (1.446)
+p = 0,004
 </td>
 <td>
--4.639<sup>***</sup> (1.345)
+p = 0,230
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-pop_density_log
 </td>
 <td>
--0.608<sup>***</sup> (0.213)
 </td>
 <td>
--0.629<sup>***</sup> (0.206)
 </td>
 <td>
--0.488<sup>**</sup> (0.225)
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-frekwencja
+Zarobki log
 </td>
 <td>
--0.336<sup>***</sup> (0.040)
+-3,828<sup>***</sup>
 </td>
 <td>
--0.307<sup>***</sup> (0.039)
+-3,796<sup>***</sup>
 </td>
 <td>
--0.345<sup>***</sup> (0.043)
+-2,691<sup>**</sup>
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-flood
 </td>
 <td>
-0.718 (0.582)
+p = 0,002
 </td>
 <td>
-0.576 (0.565)
+p = 0,002
 </td>
 <td>
-0.919 (0.639)
+p = 0,013
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-primary_uneducated_perc
 </td>
 <td>
-0.185<sup>***</sup> (0.052)
 </td>
 <td>
-0.198<sup>***</sup> (0.050)
 </td>
 <td>
-0.204<sup>***</sup> (0.055)
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-partners_perc_log
+Wykształcenie
 </td>
 <td>
--2.220<sup>***</sup> (0.259)
+0,059
 </td>
 <td>
--1.925<sup>***</sup> (0.257)
+0,066
 </td>
 <td>
--1.811<sup>***</sup> (0.354)
+0,123<sup>***</sup>
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-benefit_500_pp
 </td>
 <td>
-0.130 (0.146)
+p = 0,175
 </td>
 <td>
-0.062 (0.144)
+p = 0,127
 </td>
 <td>
-0.325<sup>**</sup> (0.158)
+p = 0,006
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-elderly_perc
 </td>
 <td>
-0.357<sup>***</sup> (0.076)
 </td>
 <td>
-0.269<sup>***</sup> (0.075)
 </td>
 <td>
-0.281<sup>***</sup> (0.070)
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-Constant
+Zaludnienie log
 </td>
 <td>
-62.053<sup>***</sup> (12.848)
+-0,338<sup>*</sup>
 </td>
 <td>
-58.340<sup>***</sup> (12.439)
+-0,350<sup>**</sup>
 </td>
 <td>
-53.325<sup>***</sup> (11.874)
+-0,073
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+p = 0,059
+</td>
+<td>
+p = 0,047
+</td>
+<td>
+p = 0,686
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Frekwencja
+</td>
+<td>
+-0,248<sup>***</sup>
+</td>
+<td>
+-0,241<sup>***</sup>
+</td>
+<td>
+-0,271<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+p = 0,000
+</td>
+<td>
+p = 0,000
+</td>
+<td>
+p = 0,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Powódź
+</td>
+<td>
+0,244
+</td>
+<td>
+0,216
+</td>
+<td>
+-0,017
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+p = 0,609
+</td>
+<td>
+p = 0,645
+</td>
+<td>
+p = 0,975
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+PSL 2015
+</td>
+<td>
+0,416<sup>***</sup>
+</td>
+<td>
+0,407<sup>***</sup>
+</td>
+<td>
+0,435<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+p = 0,000
+</td>
+<td>
+p = 0,000
+</td>
+<td>
+p = 0,000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Kukiz 2015
+</td>
+<td>
+0,473<sup>***</sup>
+</td>
+<td>
+0,466<sup>***</sup>
+</td>
+<td>
+0,354<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+p = 0,000
+</td>
+<td>
+p = 0,000
+</td>
+<td>
+p = 0,00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Partnerzy log
+</td>
+<td>
+-1,605<sup>***</sup>
+</td>
+<td>
+-1,537<sup>***</sup>
+</td>
+<td>
+-1,469<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+p = 0,000
+</td>
+<td>
+p = 0,000
+</td>
+<td>
+p = 0,00000
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+500+
+</td>
+<td>
+0,044
+</td>
+<td>
+0,029
+</td>
+<td>
+0,125
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+p = 0,735
+</td>
+<td>
+p = 0,819
+</td>
+<td>
+p = 0,330
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Osoby 60+
+</td>
+<td>
+0,221<sup>***</sup>
+</td>
+<td>
+0,200<sup>***</sup>
+</td>
+<td>
+0,153<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+p = 0,001
+</td>
+<td>
+p = 0,002
+</td>
+<td>
+p = 0,009
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Stała
+</td>
+<td>
+41,767<sup>***</sup>
+</td>
+<td>
+41,097<sup>***</sup>
+</td>
+<td>
+31,782<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+p = 0,0002
+</td>
+<td>
+p = 0,0001
+</td>
+<td>
+p = 0,001
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
 </td>
 </tr>
 <tr>
@@ -775,7 +1534,7 @@ Moran pvalue
 0
 </td>
 <td>
-0.176
+0.397
 </td>
 </tr>
 <tr>
@@ -783,7 +1542,7 @@ Moran pvalue
 R<sup>2</sup>
 </td>
 <td>
-0.690
+0,795
 </td>
 <td>
 </td>
@@ -795,24 +1554,11 @@ R<sup>2</sup>
 Adjusted R<sup>2</sup>
 </td>
 <td>
-0.683
+0,789
 </td>
 <td>
 </td>
 <td>
-</td>
-</tr>
-<tr>
-<td style="text-align:left">
-Log Likelihood
-</td>
-<td>
-</td>
-<td>
--895.106
-</td>
-<td>
--867.559
 </td>
 </tr>
 <tr>
@@ -822,10 +1568,10 @@ sigma<sup>2</sup>
 <td>
 </td>
 <td>
-6.477
+4,442
 </td>
 <td>
-5.354
+3,366
 </td>
 </tr>
 <tr>
@@ -835,60 +1581,10 @@ Akaike Inf. Crit.
 <td>
 </td>
 <td>
-1,814.212
+1,673,151
 </td>
 <td>
-1,759.119
-</td>
-</tr>
-<tr>
-<td style="text-align:left">
-Residual Std. Error
-</td>
-<td>
-2.630 (df = 370)
-</td>
-<td>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td style="text-align:left">
-F Statistic
-</td>
-<td>
-91.639<sup>***</sup> (df = 9; 370)
-</td>
-<td>
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td style="text-align:left">
-Wald Test (df = 1)
-</td>
-<td>
-</td>
-<td>
-18.189<sup>***</sup>
-</td>
-<td>
-147.851<sup>***</sup>
-</td>
-</tr>
-<tr>
-<td style="text-align:left">
-LR Test (df = 1)
-</td>
-<td>
-</td>
-<td>
-13.079<sup>***</sup>
-</td>
-<td>
-68.171<sup>***</sup>
+1,588,912
 </td>
 </tr>
 <tr>
@@ -897,13 +1593,14 @@ LR Test (df = 1)
 </tr>
 <tr>
 <td style="text-align:left">
-<em>Note:</em>
+Poziomy istotności
 </td>
 <td colspan="3" style="text-align:right">
-<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+<sup><em></sup>p&lt;0,1; <sup><strong></sup>p&lt;0,05; <sup></strong></em></sup>p&lt;0,01
 </td>
 </tr>
 </table>
+</div>
 </div>
 
 
@@ -915,6 +1612,8 @@ LR Test (df = 1)
 &nbsp;
 
 
+</div>
+</div>
 
 </div>
 

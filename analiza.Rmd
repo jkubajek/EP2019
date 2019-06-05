@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r echo = FALSE}
+```{r analiza1, echo = FALSE}
 library(dplyr)
 library(tidyr)
 library(foreign)
@@ -50,38 +50,121 @@ source("EP2019/scripts/functions.R", encoding = "UTF-8")
 ```
 
 
-#Poparcie PiS w 2019
-```{r echo = FALSE, fig.width=7, fig.height=8, fig.align = 'center', results='asis'}
+W niniejszej analizie wykorzystano zarówno zwykłą regresję liniową (OLS), jak i dwa modele z zakresu ekonometrii przestrzennej.
+
+<br>
+
+# Ekonometria przestrzenna
+
+Ekonometria przestrzenna pozwala na uwzględnienie zależności przestrzennych między obserwacjami. Jest ona podobna do analizy szeregów czasowych, ale procesy zachodzące między obserwacjami są bardziej złożone, ponieważ mają one miejsce w przestrzeni dwuwymiarowej, a nie jednowymiarowej jaką jest czas. W ekonometrii przestrzennej, na daną jednostkę wpływają jednostki sąsiednie, ale ona również ma na nie wpływ. Z tego powodu modele przestrzenne szacuje się metodą największej wiarygodności lub dwustopniową KMNK, a nie w pojedynczym kroku jak ma to miejsce w standardowej metodzie najmniejszych kwadratów (KMNK/OLS).
+
+W analizie wykorzystano dwa modele przestrzenne: model przestrzennej autoregresji (SAR) oraz model przestrzennej autokorelacji składnika losowego (SEM). Przyjmują one odpowiednio następujące postacie:
+ 
+$$
+\begin{aligned}
+SAR: \quad y_i = \alpha + x_i \beta + \rho W y_{j \neq i} + \varepsilon_{i} 
+\end{aligned}
+$$
+
+$$ 
+\begin{aligned}
+SEM: \quad y_i = \alpha + x_i \beta + \mu_{i} \\ \mu_{i} =  \lambda W \mu_{j \neq i} + \varepsilon_{i} 
+\end{aligned}
+$$
+
+Model SAR można traktować jako odpowiednik procesu AR w szeregach czasowych, zaś SEM jako MA. W przypadku gdy prawdziwa postać zależności przestrzennych przyjmuje formę autoregresyjną, to nieuwzględnienie istotnej zmiennej jaką są obserwacje $y_{j \neq i}$ powoduje obciążenie estymatorów w modelu regresji liniowej (OLS). Gdyby zależność przyjmowała faktycznie postać przestrzennej autokorelacji składnika losowego, to teoretycznie oszacowania OLS byłyby przez cały czas nieobciążone, ale nieefektywne. Oznacza to że zawyżone byłoby odchylenie standardowe poszczególnych oszacowań, co mogłoby doprowadzić do odrzucenia zmiennej, która jest istotna.
+
+Dużo więcej informacji na temat modeli przestrzennych można znaleźć na stronie [Andrzeja Torója](https://web.sgh.waw.pl/~atoroj/) w zakładce *Ekonometria przestrzenna*, który prowadzi na SGH zajęcia między innymi z ekonometrii przestrzennej.
+
+<br>
+
+## Macierz W
+
+We wzorach modeli przestrzennych pojawiła się macierz $W$, która sprowadza macierz zależności przestrzenne między obserwacjami do wektora. Bez użycia macierzy W równanie modelu przestrzennego byłoby nieidentyfikowalne, ze względu na liczbę parametrów do oszacowania większą od liczby obserwacji. 
+
+Standardowo macierze W wyznacza się na podstawie kryterium sąsiedztwa lub na podstawie odległości między obserwacjami. W tej analizie, modele przestrzenne zostały oszacowane przy użyciu macierzy, gdzie wagami połączeń między obserwacjami jest odwrotność odległości między geograficznymi środkami powiatów (centroidami). W przypadku gdy powiaty są odległe o ponad 100 km, waga połączeń między nimi przyjmuje zero.
+
+<br>
+
+
+## Test Morana
+
+Test Morana jest testem statystycznym, który mierzy czy reszty z danego modelu są skorelowane przestrzennie, czyli bada czy mamy do czynienia z czynnikiem przestrzennym, który może zaburzać oszacowania lub ich istotność. Hipoteza zerowa testu mówi o braku autokorelacji przestrzennej reszt. Tym samym przy niskim *p value* tę hipotezę należy odrzucić na rzecz alternatywnego założenia o występowaniu czynnika przestrzennego.
+
+<br>
+
+# Wynik PiS w 2019
+
+Na podstawie tabeli z wynikami modeli można zaobserwować, że w danych rzeczywiście występuje ukryte zjawisko przestrzenne, ponieważ *p value* testu Morana dla modelu OLS przyjmuje w zaokrągleniu zero. Co więcej, model autoregresji przestrzennej (SAR) jest niewystarczający do wyeliminowania ukrytych zależności. Dopiero model SEM pozwala na uwzględnienie procesu przestrzennego i poprawną estymację parametrów. 
+
+Jedynie w modelu SEM zmienna *500+* staje się istotna, tym samym można zauważyć że posługując się zwykłą regresją liniową moglibyśmy dojść do błędnego wniosku, że program 500+ nie wpływa na poziom poparcia PiS. 
+
+Warto również zwrócić uwagę na to że nieistotna w modelu SEM jest m.in. *Powódź*. Zmienna ta przyjmuje jeden dla powiatów, w których był ogłoszony stan alarmowy lub wystąpiły lokalne podtopienia. Może to wskazywać to na to, że wbrew głosom mówiącym o tym że obecność polityków PiS na wałach przeciwpowodziowych zwiększyła ich poparcie, taki efekt nie wystąpił lub był pomijalny statystycznie.
+
+Ponadto, statystycznie nieistotne okazały się następujące zmienne: *Zarobki*, *Zaludnienie* oraz *Osoby 60+*.
+
+Skrót *log* po nazwie niektórych zmiennych, oznacza że w modelu wykorzystano zlogarytmizowaną zmienną. Empiryczny poziom istotności (*p value*) podano pod oszacowaniem parametru.
+
+<br>
+
+
+<div align="center">
+```{r analiza2, echo = FALSE, fig.width=7, fig.height=8, fig.align = 'center', results='asis'}
 load(paste0(main_dir, "/Data/EP2019/models_PiS_2019.RData"))
 stargazer::stargazer(model_OLS, model_SAR_Slag, model_SEM,
                             type = 'html',
-                            dep.var.labels.include = FALSE,
-                            dep.var.caption = "",
-                            omit.stat = c("n"),
+                     report = "vc*p",
+                     decimal.mark = ",",
+                            dep.var.caption  = "Zmienna objaśniana:",
+                            dep.var.labels = "Poparcie PiS 2019",
+                            omit.stat = c("n", "ll", "f", "wald", "lr", "ser"),
                             title = "Wyniki modeli",
-                            single.row = TRUE, 
-                            # column.labels = c("W - odległość", "W - I st.", "W - 5k"),
+                     model.numbers = FALSE,
+                     model.names = TRUE,
+                            # single.row = TRUE, 
+                            column.labels = c("OLS", "SAR", "SEM"),
+                     column.sep.width = "100pt",
+                     notes.label = "Poziomy istotności",
+                     # covariate.labels = c("Bezrobocie", "Zarobki log", "Wykształcenie", "Zaludnienie log", "Frekwencja", "Powódź", "PSL 2015", "Partnerzy log", "500+", "Osoby 60+", "Stała"),
+                     covariate.labels = c("Bezrobocie", "Zarobki log", "Wykształcenie", "Zaludnienie log", "Frekwencja", "Powódź", "Partnerzy log", "500+", "Osoby 60+", "Stała"),
                             # digits = 2,
-                            add.lines = list(c("Moran pvalue", return_moran_p_val(moran_OLS), return_moran_p_val(moran_SAR), 
-                                               return_moran_p_val(moran_SEM)))
+                            add.lines = list(c("Moran pvalue", return_moran_p_val(moran_OLS), return_moran_p_val(moran_SAR), return_moran_p_val(moran_SEM)))
                             )
 ```
+</div>
 
 <br> <br>
 
-#Zmiana poparcia dla PiS między 2015 a 2019
-```{r echo = FALSE, fig.width=7, fig.height=8, fig.align = 'center', results='asis'}
+# Zmiana poparcia PiS
+
+W drugim zestawie modeli zmienną objaśnianą była zmianę poparcia PiS między wyborami parlamentarnymi z 2015, a ostatnimi wyborami do PE. Również tutaj można zobaczyć, że uwzględnienie zależności przestrzennych wpływa na zmianę istotności statystycznej poszczególnych zmiennych oraz ich parametry. Podobnie jak wcześniej jedynie model SEM pozwolił wyeliminować ukryty czynnik przestrzenny.
+
+Analizując wyniki modeli, warto zwrócić uwagę na wartość parametrów stojących przy zmiennych *PSL 2015* oraz *Kukiz 2015*. Parametr o wartości $0,435$, stojący przy zmiennej *PSL 2015*, oznacza że 1 pkt. proc. poparcia PSLu w 2015 r. przełożył się na wzrost poparcie PiS o 0,435 pkt. proc.
+
+W modelu nieistotny okazał się wpływ programu *500+*, co w połączeniu z wyniami pierwszej części analizy może sugerować, że tzw. *efekt 500+* wystąpił w wyborach parlamentarnych z 2015 i trwa do tej pory na stałym poziomie, a wprowadzenie dodatkowego świadczenia na pierwsze dziecko nie przełożyło się na dodatkowy wzrost poparcia obozu rządzącego.
+
+<br>
+
+<div align="center">
+```{r analiza3, echo = FALSE, fig.width=7, fig.height=8, fig.align = 'center', results='asis'}
 load(paste0(main_dir, "/Data/EP2019/models_diff_2019.RData"))
 stargazer::stargazer(model_OLS, model_SAR_Slag, model_SEM,
                             type = 'html',
-                            dep.var.labels.include = FALSE,
-                            dep.var.caption = "",
-                            omit.stat = c("n"),
+                     report = "vc*p",
+                     decimal.mark = ",",
+                            dep.var.caption  = "Zmienna objaśniana:",
+                            dep.var.labels = "Zmiana poparcia PiS",
+                            omit.stat = c("n", "ll", "f", "wald", "lr", "ser"),
                             title = "Wyniki modeli",
-                            single.row = TRUE, 
-                            # column.labels = c("W - odległość", "W - I st.", "W - 5k"),
+                     model.numbers = FALSE,
+                     model.names = TRUE,
+                            # single.row = TRUE, 
+                            column.labels = c("OLS", "SAR", "SEM"),
+                     column.sep.width = "100pt",
+                     notes.label = "Poziomy istotności",
+                     covariate.labels = c("Bezrobocie", "Zarobki log", "Wykształcenie", "Zaludnienie log", "Frekwencja", "Powódź", "PSL 2015", "Kukiz 2015", "Partnerzy log", "500+", "Osoby 60+", "Stała"),
                             # digits = 2,
-                            add.lines = list(c("Moran pvalue", return_moran_p_val(moran_OLS), return_moran_p_val(moran_SAR), 
-                                               return_moran_p_val(moran_SEM)))
+                            add.lines = list(c("Moran pvalue", return_moran_p_val(moran_OLS), return_moran_p_val(moran_SAR), return_moran_p_val(moran_SEM)))
                             )
 ```
+</div>

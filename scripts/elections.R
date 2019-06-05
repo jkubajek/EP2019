@@ -63,6 +63,7 @@ votes_2015 <- read.xlsx("EP2019/data/2015-gl-lis-pow.xlsx") %>%
     mutate(votes_2015_pis_perc = (votes_2015_pis / votes_2015_all) * 100,
            votes_2015_ke_perc = ((votes_2015_po + votes_2015_sld + votes_2015_psl + 
                                      votes_2015_n) / votes_2015_all) * 100,
+           votes_2015_psl_perc = (votes_2015_psl /votes_2015_all) * 100,
            votes_2015_braun = ifelse(is.na(votes_2015_braun), 0, votes_2015_braun),
            votes_2015_konfederacja_perc = ((votes_2015_korwin + votes_2015_braun) / votes_2015_all) * 100,
            votes_2015_kukiz_perc = (votes_2015_kukiz /votes_2015_all) * 100,
@@ -71,7 +72,7 @@ votes_2015 <- read.xlsx("EP2019/data/2015-gl-lis-pow.xlsx") %>%
                   dplyr::select(TERYT, Frekwencja) %>%
                   rename(frekwencja_2015 = Frekwencja), by = "TERYT") %>%
     dplyr::select(TERYT, votes_2015_pis_perc, votes_2015_ke_perc, frekwencja_2015, votes_2015_konfederacja_perc,
-                  votes_2015_kukiz_perc, votes_2015_razem_perc)
+                  votes_2015_kukiz_perc, votes_2015_razem_perc, votes_2015_psl_perc)
 
 salaries <- read.xlsx("EP2019/data/WYNA_2497_XTAB_20190527184602.xlsx", sheet = "TABLICA") %>%
     dplyr::select(Kod, X18) %>%
@@ -173,43 +174,41 @@ dataset <- votes %>%
            frekwencja_diff = frekwencja - frekwencja_2015) %>%
     as.data.frame()
 
-save(dataset, file = "EP2019/data/dataset.RData")
-
 # ###################################################################
 # Initial analysis
 # ###################################################################
-model_frekwencja <- lm(frekwencja ~ unempl + 
-                           salary_log + pop_density_log + 
-                           #children_perc +
-                           elderly_perc, data = dataset)
-model_frekwencja %>% summary()
-
-model_age <- lm(children_perc ~ elderly_perc, data = dataset)
-model_age %>% summary()
-
-model_benefit <- lm(benefit_500_pp ~ elderly_perc + primary_uneducated_perc, data = dataset)
-model_benefit %>% summary()
-
-model_rand <- lm(rand_val ~ elderly_perc + benefit_500_pp + salary_log +
-                     unempl, data = dataset)
-model_rand %>% summary()
-
-# Plots of distribution
-ggplot(dataset)+
-    geom_density(aes(x = benefit_500_pp, y = ..density..))+
-    theme_bw()
-
-ggplot(dataset)+
-    geom_density(aes(x = partners_perc_log, y = ..density..))+
-    theme_bw()
-
-ggplot(dataset)+
-    geom_density(aes(x = salary_log, y = ..density..))+
-    theme_bw()
-
-ggplot(dataset)+
-    geom_density(aes(x = log(unempl_2019_04), y = ..density..))+
-    theme_bw()
+# model_frekwencja <- lm(frekwencja ~ unempl + 
+#                            salary_log + pop_density_log + 
+#                            #children_perc +
+#                            elderly_perc, data = dataset)
+# model_frekwencja %>% summary()
+# 
+# model_age <- lm(children_perc ~ elderly_perc, data = dataset)
+# model_age %>% summary()
+# 
+# model_benefit <- lm(benefit_500_pp ~ elderly_perc + primary_uneducated_perc, data = dataset)
+# model_benefit %>% summary()
+# 
+# model_rand <- lm(rand_val ~ elderly_perc + benefit_500_pp + salary_log +
+#                      unempl, data = dataset)
+# model_rand %>% summary()
+# 
+# # Plots of distribution
+# ggplot(dataset)+
+#     geom_density(aes(x = benefit_500_pp, y = ..density..))+
+#     theme_bw()
+# 
+# ggplot(dataset)+
+#     geom_density(aes(x = partners_perc_log, y = ..density..))+
+#     theme_bw()
+# 
+# ggplot(dataset)+
+#     geom_density(aes(x = salary_log, y = ..density..))+
+#     theme_bw()
+# 
+# ggplot(dataset)+
+#     geom_density(aes(x = log(unempl_2019_04), y = ..density..))+
+#     theme_bw()
 
 # ###################################################################
 # Unused R2 decomposition
@@ -222,7 +221,6 @@ ggplot(dataset)+
 # ###################################################################
 # Interactive map
 # ###################################################################
-load("EP2019/data/dataset.RData")
 mapa <- readOGR(dsn = "Maps/Powiaty/powiaty.shp", layer = "powiaty")
 mapa <- spTransform(mapa, "+proj=longlat")
 # 
@@ -238,8 +236,9 @@ mapa <- spTransform(mapa, "+proj=longlat")
 # load("EP2019/data/map_simplified.RData")
 mapa <- merge(y = dataset, x = mapa, by.x = "jpt_kod_je", by.y = "TERYT")
 
+
 # ###################################################################
-# Econometric analysis
+# W matrix
 # ###################################################################
 centroids <- coordinates(mapa)
 
@@ -249,36 +248,38 @@ gamma <- 1
 w_mat <- 1/(w_mat ^ gamma) * (w_mat <= 100)
 diag(w_mat) <- 0
 w_mat <- w_mat / rowSums(w_mat) # normalizacja macierzy W - dzielimy przez sumy wierszowe
+
+# Extract values from W matrix
+pow_num <- which(mapa@data$nazwa == "Warszawa")
+mapa@data$w_warszawa <- w_mat[pow_num, ]
+
+pow_num <- which(mapa@data$nazwa == "mielecki")
+mapa@data$w_mielecki <- w_mat[pow_num, ]
+
+pow_num <- which(mapa@data$nazwa == "szamotulski")
+mapa@data$w_szamotulski <- w_mat[pow_num, ]
+
+dataset <- dataset %>%
+    left_join(mapa@data %>%
+                  dplyr::select(jpt_kod_je, w_warszawa, w_mielecki, w_szamotulski), by = c("TERYT" = "jpt_kod_je"))
+
 w_mat <- mat2listw(w_mat) # Zamiana macierzy na liste - redukcja wymiarow
 
-# Main Formula
-model_formula <- votes_pis_perc ~
-# model_formula <- votes_pis_perc_diff ~
-# model_formula <- votes_konfederacja_perc ~
-    unempl_2019_04_log +
-    # unempl_2019_04 +
-    # unempl_factor +
-    salary_log +
-    pop_density_log +
-    # proc_niewaznych +
-    frekwencja +
-    flood +
-    # matura_pass_rate_general_2017 +
-    # uneducated_perc +
-    # primary_perc +
-    primary_uneducated_perc +
-    # frekwencja_diff +
-    partners_perc_log +
-    benefit_500_pp +
-    elderly_perc
-
+# Save dataset
+save(dataset, file = "EP2019/data/dataset.RData")
+# load("EP2019/data/dataset.RData")
+# ###################################################################
+# Econometric analysis
+# ###################################################################
 formula_votes_2019 <- votes_pis_perc ~
     unempl_2019_04 +
     salary_log +
+    primary_uneducated_perc +
     pop_density_log +
     frekwencja +
     flood +
-    primary_uneducated_perc +
+    # votes_2015_psl_perc +
+    # votes_2015_kukiz_perc +
     partners_perc_log +
     benefit_500_pp +
     elderly_perc
@@ -288,7 +289,7 @@ model_OLS %>% summary()
 car::vif(model_OLS)
 
 # R2 decomposition
-relaimpo::calc.relimp(model_OLS)
+importance_r2 <- relaimpo::calc.relimp(model_OLS)
 
 # Wystepuja zaleznosci przestrzenne
 moran_OLS <- lm.morantest(model_OLS, w_mat, alternative = "greater")
@@ -301,8 +302,8 @@ brks <- brks$brks
 sgh_green <- rgb(13, 85, 72, 160, names = NULL, maxColorValue = 255)
 
 # Wykresy morana
-moran.plot(res, w_mat, ylab="Opóźnienie przestrzenne reszt: W*e", xlab="Reszty: e", pch = 20, 
-           main = "Wykres Morana sąsiedztwo I rzędu", col = sgh_green) 
+moran.plot(res, w_mat, ylab="OpĂłĹşnienie przestrzenne reszt: W*e", xlab="Reszty: e", pch = 20, 
+           main = "Wykres Morana sÄ…siedztwo I rzÄ™du", col = sgh_green) 
 
 # Model SAR Slag
 model_SAR_Slag <- lagsarlm(formula_votes_2019, listw = w_mat, data = mapa@data)
@@ -328,7 +329,7 @@ moran_SARAR <- moran.test(model_SARAR$residuals, listw = w_mat)
 
 model_SARAR$type <- model_SEM$type
 
-save(model_OLS, moran_OLS, model_SAR_Slag, moran_SAR, model_SEM, moran_SEM,
+save(model_OLS, moran_OLS, model_SAR_Slag, moran_SAR, model_SEM, moran_SEM, formula_votes_2019,
      file = "Data/EP2019/models_PiS_2019.RData")
 
 out <- stargazer::stargazer(model_OLS, model_SAR_Slag, model_SEM,
@@ -339,7 +340,7 @@ out <- stargazer::stargazer(model_OLS, model_SAR_Slag, model_SEM,
                             omit.stat = c("n"),
                             title = "Wyniki modeli",
                             single.row = TRUE, 
-                            # column.labels = c("W - odległość", "W - I st.", "W - 5k"),
+                            # column.labels = c("W - odlegĹ‚oĹ›Ä‡", "W - I st.", "W - 5k"),
                             # digits = 2,
                             add.lines = list(c("Moran pvalue", return_moran_p_val(moran_OLS), return_moran_p_val(moran_SAR), 
                                                return_moran_p_val(moran_SEM)))
@@ -349,10 +350,12 @@ out <- stargazer::stargazer(model_OLS, model_SAR_Slag, model_SEM,
 formula_diff <- votes_pis_perc_diff ~
     unempl_2019_04 +
     salary_log +
+    primary_uneducated_perc +
     pop_density_log +
     frekwencja +
     flood +
-    primary_uneducated_perc +
+    votes_2015_psl_perc +
+    votes_2015_kukiz_perc +
     partners_perc_log +
     benefit_500_pp +
     elderly_perc
@@ -375,7 +378,7 @@ model_SEM %>% summary()
 moran_SEM <- moran.test(model_SEM$residuals, listw = w_mat)
 
 # Save models
-save(model_OLS, moran_OLS, model_SAR_Slag, moran_SAR, model_SEM, moran_SEM,
+save(model_OLS, moran_OLS, model_SAR_Slag, moran_SAR, model_SEM, moran_SEM, formula_diff,
      file = "Data/EP2019/models_diff_2019.RData")
 ##################################################
 # Variables importance
@@ -386,15 +389,15 @@ variables_DF <- data.frame(variable = c("unempl_2019_04", "unempl_2019_04_log", 
                                         "frekwencja", "primary_uneducated_perc",
                                         "partners_perc_log", "benefit_500_pp", "elderly_perc", 
                                         "flood"),
-                           variable_name = c("Bezrobocie", "Logarytm bezrobocia", "Spadek bezrobocia", "Średnia płaca",
-                                             "Gęstość zaludnienia", "Frekwencja 2019",
+                           variable_name = c("Bezrobocie", "Logarytm bezrobocia", "Spadek bezrobocia", "Ĺšrednia pĹ‚aca",
+                                             "GÄ™stoĹ›Ä‡ zaludnienia", "Frekwencja 2019",
                                              "<= Podstawowe",
-                                             "Partnerzy (NSP 2011)", "500+ na osobę", "Osoby 60+",
-                                             "Powódź"))
+                                             "Partnerzy (NSP 2011)", "500+ na osobÄ™", "Osoby 60+",
+                                             "PowĂłdĹş"))
 # Random forest importance
 # https://explained.ai/rf-importance/
 RF_variables_importance(dataset, model_formula, variables_DF, 
-                        plot_title = "Waga zmiennych w wyjaśnianiu poparcia PiS")
+                        plot_title = "Waga zmiennych w wyjaĹ›nianiu poparcia PiS")
 
 ##################################################
 # Analiza zmiennych - Korelacja miedzy zmiennymi
@@ -417,9 +420,9 @@ cor_data <- dataset %>%
     data.frame()
 
 GGally::ggpairs(cor_data, 
-        upper = list(continuous = wrap("cor", size = 8),
-                     discrete = wrap("facetbar", size = 6)),
-        lower = list(continuous = wrap(my_fn, method="lm")))+
+        upper = list(continuous = GGally::wrap("cor", size = 8),
+                     discrete = GGally::wrap("facetbar", size = 6)),
+        lower = list(continuous = GGally::wrap(my_fn, method="lm")))+
     theme_bw(base_size = 16)
 
 ggsave("EP2019/plots/variables_correlation.png", width = 12, height = 12, dpi = 300)

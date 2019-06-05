@@ -1,0 +1,11 @@
+Na poniższej mapie zaprezentowano siłę połączeń dla wybranych powiatów.
+
+```{r echo = FALSE, fig.width=7, fig.height=8, fig.align = 'center', results='asis', cache=FALSE}
+num_var <- 3
+plot_leaflet_map_groups(mapa, variables_to_plot = c("w_warszawa", "w_mielecki", "w_szamotulski"),
+                        groups_names = c("Warszawa", "mielecki", "szamotulski"), 
+                        name_of_region = "nazwa",
+                        popup_texts = rep("Siła oddziaływania: ", num_var),  end_texts = rep("", num_var), 
+                        legend_digits = c(rep(3, 3)), popup_round = 3, frame_height = 500,
+                        colors_num = 4)
+```

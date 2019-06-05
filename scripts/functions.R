@@ -45,22 +45,32 @@ plot_leaflet_map <- function(map_object, variable_to_plot, name_of_region,
 
 plot_leaflet_map_groups <- function(map_object, variables_to_plot, groups_names,
                                     name_of_region,
-                                    popup_texts,  end_texts, legend_digits, popup_round = 2, frame_height = 500){
+                                    popup_texts,  end_texts, legend_digits, popup_round = 2, frame_height = 500,
+                                    popup_variables = NULL,
+                                    colors_num = 7){
+    
+    if(is.null(popup_variables)){
+        popup_variables <- variables_to_plot
+    }
     
     map_leaflet <- leaflet(data = map_object)
     iter <- 1
     
     for (variable in variables_to_plot){
         # Find breaks
-        brks <- classIntervals(map_object@data[, variable], n = 7, style = "jenks")
+        brks <- classIntervals(map_object@data[, variable], n = colors_num, style = "jenks")
         brks <- brks$brks
         # "YlGnBu" "YlOrRd"
         pal <- colorBin("YlGnBu", domain = map_object@data[, variable], bins = brks)
         
-        
+        if(is.na(popup_variables[iter])){
+            popup_variable <- variable
+        } else {
+            popup_variable <- popup_variables[iter]
+        }
         popup <- stringr::str_c("<strong>", map_object@data[, name_of_region], "</strong>",
                                           "<br/>",
-                                          popup_texts[iter], round(map_object@data[, variable], popup_round), end_texts[iter]) %>%
+                                          popup_texts[iter], round(map_object@data[, popup_variable], popup_round), end_texts[iter]) %>%
                        purrr::map(htmltools::HTML)
         
         map_leaflet <- map_leaflet %>%
@@ -130,6 +140,29 @@ RF_variables_importance <- function(dataset, model_formula, variables_DF,
                                            nodesize = nodesize, importance = T)
     v_importance <- randomForest::importance(model_rf, type = 1, scale = T) %>% as.data.frame()
     v_importance <- v_importance %>% round(popup_round)
+    colnames(v_importance) <- c("Importance")
+    v_importance$variable <- rownames(v_importance)
+    v_importance <- v_importance %>%
+        left_join(variables_DF, by = "variable")
+    
+    p <- ggplot(v_importance)+
+        geom_col(fill = col_fill, aes(x = reorder(variable_name, -Importance), y = Importance))+
+        ylab(y_title)+
+        xlab("")+
+        ggtitle(plot_title)+
+        coord_flip()+
+        theme_bw()
+    
+    plotly::ggplotly(p, tooltip = c("y"))
+}
+
+OLS_variables_importance <- function(model_OLS, variables_DF, 
+                                    col_fill = "#2c7fb8", popup_round = 2, 
+                                    plot_title = "Dekompozycja R2",
+                                    y_title = "Procent wyjaśnianej zmienności"){
+    
+    v_importance <- relaimpo::calc.relimp(model_OLS)
+    v_importance <- v_importance$lmg %>% as.data.frame() %>% round(popup_round)
     colnames(v_importance) <- c("Importance")
     v_importance$variable <- rownames(v_importance)
     v_importance <- v_importance %>%
