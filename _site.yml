@@ -13,6 +13,7 @@ output:
     toc_float: true
     include:
       after_body: footer.html
+      in_header: GA_script.html
     css: style.css
 navbar:
   title: "Wybory do PE 2019"
