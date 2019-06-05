@@ -26,7 +26,7 @@ navbar:
     - text: "Istotność zmiennych"
       href: istotnosc.html
     - text: "Podsumowanie"
-      href: Podsumowanie.html
+      href: podsumowanie.html
   right:
     - icon: fa-envelope fa-lg
       href: mailto:j.kubajek@gmail.com
