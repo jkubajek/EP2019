@@ -58,7 +58,7 @@ mapa <- merge(y = dataset, x = mapa, by.x = "jpt_kod_je", by.y = "TERYT")
 
 Na poniższych mapa można zobaczyć wyniki wyborów do Parlamentu Europejskiego w 2019 r. zmianę poparcia głównych partii w stosunku do ich wyników z 2015 r. oraz główne zmienne społeczno-demograficzne oraz gospodarcze. 
 
-**Uwaga ze względu na ograniczoną funkcjonalność pakietu *Leaflet* przed zmianą mapy należy najpierw odznaczyć obecną mapę, a dopiero póżniej wskazać kolejną.**
+**Uwaga, ze względu na ograniczoną funkcjonalność pakietu *Leaflet* przed zmianą mapy należy najpierw odznaczyć obecną mapę, a dopiero póżniej wskazać kolejną.**
 
 <br>
 

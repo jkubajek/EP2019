@@ -2,8 +2,8 @@
 title: "Wprowadzenie"
 ---
 
-Analiza wyników wyborów do Parlamentu Europejskiego (PE) 2019, przedstawiona na tej stronie, składa się z trzech części: wizualizacji przestrzennej, analizy ekonometrycznej oraz oszacowania istotności poszczególnych zmiennych w wyjaśnianiu wyniku wyborów.
+Analiza wyników wyborów do Parlamentu Europejskiego (PE) 2019 przedstawiona na tej stronie, składa się z trzech części: wizualizacji przestrzennej, analizy ekonometrycznej oraz oszacowania istotności poszczególnych zmiennych w wyjaśnianiu wyniku wyborów.
 
-W analizie wykorzystano dane pochodzące z PKW oraz Banku Danych Lokalnych (BDL) GUS. Wszystkie zmienne przedstawiono na poziomie powiatów. W przypadku informacji pochodzących z Narodowego Spisu Powszechnego (NSP) z 2011, przyjęto że dane dla powiatu wałbrzyskiego oraz dla miasta Wałbrzych mają taką samą wartość, ponieważ w latach 2002-2013 te dwie jednostki administracyjne stanowiły jeden powiat. Dokładniejsze omówienie zmiennych wykorzystanych w analizie można znaleźć w zakładce wizualizacja.
+W analizie wykorzystano dane pochodzące z PKW oraz Banku Danych Lokalnych (BDL) GUS. Wszystkie zmienne przedstawiono na poziomie powiatów. W przypadku informacji pochodzących z Narodowego Spisu Powszechnego (NSP) z 2011 przyjęto, że dane dla powiatu wałbrzyskiego oraz dla miasta Wałbrzych mają taką samą wartość, ponieważ w latach 2002-2013 te dwie jednostki administracyjne stanowiły jeden powiat. Dokładniejsze omówienie zmiennych wykorzystanych w analizie można znaleźć w zakładce wizualizacja.
 
 Głównym przedmiotem analizy ekonometrycznej jest zweryfikowanie wpływu poszczególnych zmiennych społeczno-demograficznych jak i gospodarczych na poparcie dla PiS w wyborach do PE oraz objaśnienie zmiany poparcia dla tej partii.
