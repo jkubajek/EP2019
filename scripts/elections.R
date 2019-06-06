@@ -302,8 +302,8 @@ brks <- brks$brks
 sgh_green <- rgb(13, 85, 72, 160, names = NULL, maxColorValue = 255)
 
 # Wykresy morana
-moran.plot(res, w_mat, ylab="OpĂłĹşnienie przestrzenne reszt: W*e", xlab="Reszty: e", pch = 20, 
-           main = "Wykres Morana sÄ…siedztwo I rzÄ™du", col = sgh_green) 
+moran.plot(res, w_mat, ylab="Opóźnienie przestrzenne reszt: W*e", xlab="Reszty: e", pch = 20, 
+           main = "Wykres Morana", col = sgh_green) 
 
 # Model SAR Slag
 model_SAR_Slag <- lagsarlm(formula_votes_2019, listw = w_mat, data = mapa@data)
@@ -388,16 +388,16 @@ variables_DF <- data.frame(variable = c("unempl_2019_04", "unempl_2019_04_log", 
                                         "pop_density_log", 
                                         "frekwencja", "primary_uneducated_perc",
                                         "partners_perc_log", "benefit_500_pp", "elderly_perc", 
-                                        "flood"),
-                           variable_name = c("Bezrobocie", "Logarytm bezrobocia", "Spadek bezrobocia", "Ĺšrednia pĹ‚aca",
-                                             "GÄ™stoĹ›Ä‡ zaludnienia", "Frekwencja 2019",
-                                             "<= Podstawowe",
-                                             "Partnerzy (NSP 2011)", "500+ na osobÄ™", "Osoby 60+",
-                                             "PowĂłdĹş"))
+                                        "flood", "votes_2015_psl_perc", "votes_2015_kukiz_perc"),
+                           variable_name = c("Bezrobocie", "Logarytm bezrobocia", "Spadek bezrobocia", "Średnia płaca",
+                                             "Gęstość zaludnienia", "Frekwencja 2019",
+                                             "Wykształcenie",
+                                             "Partnerzy", "500+", "Osoby 60+",
+                                             "Powódź", "PSL 2015", "Kukiz 2015"))
 # Random forest importance
 # https://explained.ai/rf-importance/
 RF_variables_importance(dataset, model_formula, variables_DF, 
-                        plot_title = "Waga zmiennych w wyjaĹ›nianiu poparcia PiS")
+                        plot_title = "Waga zmiennych w wyjaśnianiu poparcia PiS")
 
 ##################################################
 # Analiza zmiennych - Korelacja miedzy zmiennymi
