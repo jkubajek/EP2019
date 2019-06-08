@@ -89,6 +89,7 @@ OLS_variables_importance(model_OLS, variables_DF,
 # Random forest importance
 # https://explained.ai/rf-importance/
 
+set.seed(1)
 RF_variables_importance(dataset, formula_votes_2019, variables_DF, 
                         plot_title = "Waga zmiennych w wyjaśnianiu poparcia PiS")
 ```
@@ -117,6 +118,7 @@ OLS_variables_importance(model_OLS, variables_DF,
 # Random forest importance
 # https://explained.ai/rf-importance/
 
+set.seed(1)
 RF_variables_importance(dataset, formula_diff, variables_DF, 
                         plot_title = "Waga zmiennych w wyjaśnianiu zmiany poparcia PiS")
 ```

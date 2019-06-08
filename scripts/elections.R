@@ -225,11 +225,13 @@ mapa <- readOGR(dsn = "Maps/Powiaty/powiaty.shp", layer = "powiaty")
 mapa <- spTransform(mapa, "+proj=longlat")
 # 
 # # http://edrub.in/blog20170806.html
-# mapa_2 <- rmapshaper::ms_simplify(mapa, keep = 0.01)
+# mapa_2 <- rmapshaper::ms_simplify(mapa, keep = 0.005)
+## Pierwtonie mapa byla mniej uproszczona, ale zajmowaly 18 mb
+# mapa_3 <- rmapshaper::ms_simplify(mapa, keep = 0.01)
 # mapa_2 <- spTransform(mapa_2, "+proj=longlat")
 # par(mfrow = c(1, 2))
 # plot(mapa_2)
-# plot(mapa)
+# plot(mapa_3)
 # 
 # mapa <- mapa_2
 # save(mapa, file = "EP2019/data/map_simplified.RData")
